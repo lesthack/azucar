@@ -47,13 +47,30 @@ class player:
 		self.xmms.broadcast_playlist_changed(self.handler_playlist_change)
 		self.xmms.playlist_list_entries('_active', self.get_tracks)
 
-	def handler_playlist_change(self, result):
-		self.modelo.clear()
-		#self.xmms.playlist_list_entries('_active', self.get_tracks)
+	def handler_playlist_change(self, result):		
+		update = result.value()
+		print update
+		if update['type']==0: #add			
+			self.xmms.medialib_get_info(update['id'], self.add_track)
+		elif update['type']==1:
+			self.xmms.medialib_get_info(update['id'], self.add_track)
+		elif update['type']==2: #shuffle
+			self.modelo.clear()
+			
+		elif update['type']==3: #remove
+			self.remove_track(update['position'])
+		elif update['type']==4: #clear
+			self.modelo.clear()
+		elif update['type']==5: #change positions
+			print "Cambiar posición", update
+
+	def remove_track(self, position):
+		self.modelo.remove(self.modelo[position].iter)
 		
 	def get_tracks(self, result):
 		playlist = result.value()
 		for element in playlist:
+			print element
 			self.xmms.medialib_get_info(element, self.add_track)
 
 	def add_track(self, result):
@@ -132,5 +149,5 @@ class player:
 		except:
 		    name = ""
 
-		return name
+		return name.replace('+',' ')
     

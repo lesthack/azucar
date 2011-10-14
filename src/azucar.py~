@@ -44,8 +44,8 @@ except IOError, detail:
 	sys.exit(1)
 	
 def main():
-	conn = xmmsclient.glib.GLibConnector(xmms)
-	app = player()
+	#conn = xmmsclient.glib.GLibConnector(xmms)
+	app = player(xmms)
 	app.window.show()	
 	gtk.main()
 
