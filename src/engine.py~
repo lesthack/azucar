@@ -1,0 +1,32 @@
+
+import os
+import xmmsclient
+
+
+class engine(xmmsclient.XMMS):
+    def __init__(self, clientName):
+
+        self.stateConnection = False
+        self.handleDisconnect = None
+        
+        self.xmmsConnenct()
+        
+    def xmmsConnenct(self):
+        """
+        Conecta con XMMS2
+        """
+        try:
+            self.connect(os.getenv("XMMS_PATH"))
+        except IOError, detail:
+            self.stateConnection = False
+            print "Connection failed:", detail
+            return 
+        
+        self.stateConnection = True
+        
+    
+    def isConnected(self):
+        """
+        Retorna el estado del reproductor
+        """
+        return self.stateConnection
