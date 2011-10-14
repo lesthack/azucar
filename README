@@ -1,0 +1,10 @@
+Azucar
+
+Azucar is a xmms2 frontend worked in python.
+
+Librarys:
+  xmmsclient
+  xmmsclient.glib
+  
+  gtk
+  gobject
