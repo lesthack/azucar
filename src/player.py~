@@ -22,15 +22,16 @@ class player:
 		self.__properties__()
 		self.__set_signals__()
 		
-		#self.load_music()
-		
 		#self.initlogger()
 		#self.logger.info('Iniciando Actividad')
 		
 	def __properties__(self):
 		self.treeviewlist = self.builder.get_object("treeviewlist")
-		self.insearch = self.builder.get_object("insearch")		
-
+		self.insearch = self.builder.get_object("insearch")
+		self.playerbar = self.builder.get_object("playerbar")
+		self.current_song = ""
+		self.current_song_duration = 0
+		
 		self.modelo = gtk.ListStore (int, str)
 		self.treeviewlist.set_model(self.modelo)
 		
@@ -41,12 +42,17 @@ class player:
 	def __set_signals__(self):
 		self.insearch.connect("changed", self.search_song)
 		self.treeviewlist.connect("key-press-event", self.treeviewlist_keypress)
+		self.treeviewlist.connect("row-activated", self.treeviewlist_row_activated)
+		self.window.connect("key-press-event", self.main_keypress)
 		self.window.connect("configure-event", self.main_configure)
 		self.window.connect("focus-out-event", self.main_focusout)
 		self.window.connect("destroy", gtk.main_quit)
+		self.xmms.playback_current_id(self.handler_playback_current_id)
 		self.xmms.broadcast_playlist_changed(self.handler_playlist_change)
-		self.xmms.playlist_list_entries('_active', self.get_tracks)
-
+		self.xmms.broadcast_playback_current_id(self.handler_playback_current_id)
+		self.xmms.playlist_list_entries('_active', self.get_tracks)		
+		self.xmms.signal_playback_playtime(self.handler_set_time_track)		
+		
 	def handler_playlist_change(self, result):		
 		update = result.value()
 		print update
@@ -56,21 +62,45 @@ class player:
 			self.xmms.medialib_get_info(update['id'], self.add_track)
 		elif update['type']==2: #shuffle
 			self.modelo.clear()
-			
+			self.xmms.playlist_list_entries('_active', self.get_tracks)
 		elif update['type']==3: #remove
 			self.remove_track(update['position'])
 		elif update['type']==4: #clear
 			self.modelo.clear()
 		elif update['type']==5: #change positions
-			print "Cambiar posición", update
+			self.modelo.swap(self.modelo[update['position']].iter, self.modelo[update['newposition']].iter)
 
+	def handler_playback_current_id(self, result):
+		self.xmms.medialib_get_info(result.value(), self.set_track_player)
+
+	def handler_set_time_track(self, result):
+		total = result.value()
+		min = total/(60*1000)
+		sec = (total - min*1000*60)/1000
+
+		if len(str(min))==1: min = "0%s" % min
+		if len(str(sec))==1: sec = "0%s" % sec
+
+		self.playerbar.set_text("%s:%s  %s" % (min, sec, self.current_song))
+
+		progress = 0.0
+		
+		if self.current_song_duration > 0:
+			progress = (int(total)*100/int(self.current_song_duration))/100.0			
+
+		self.playerbar.set_fraction(progress)
+			
+	def set_track_player(self, result):
+		track = self.get_taginfo(result.value())
+		self.current_song = "%s - %s" % (track[1],track[2])		
+		self.current_song_duration = result.value()['duration']
+		
 	def remove_track(self, position):
 		self.modelo.remove(self.modelo[position].iter)
 		
 	def get_tracks(self, result):
 		playlist = result.value()
 		for element in playlist:
-			print element
 			self.xmms.medialib_get_info(element, self.add_track)
 
 	def add_track(self, result):
@@ -98,12 +128,6 @@ class player:
 			track.append("")
 
 		return track
-	
-	def load_music(self):
-		music = open("data/music.lst","r")
-		
-		for i in music.readlines():
-			self.modelo.append([1, i[:-1]])
 			
 	def initlogger(self):
 		self.logger = logging.getLogger('xmms2me')
@@ -122,7 +146,7 @@ class player:
 				modeltemp.append([1, self.modelo.get_value(i.iter, 1)])
 
 		self.treeviewlist.set_model(modeltemp)
-
+		
 	def treeviewlist_keypress(self, widget, event):				
 		if event.keyval	in [65293, 65364, 65362]:
 			self.app_cover.set_song("Esta es una canción mona: %s" % event.keyval)
@@ -131,6 +155,11 @@ class player:
 		elif event.keyval == 65307:
 			self.app_cover.window.hide()
 
+	def treeviewlist_row_activated(self, widget, iter, path):
+		#print self.modelo[iter[0]].iter
+		print self.modelo.get_value(self.modelo[iter[0]].iter, 0)
+		self.xmms2_play(self.modelo.get_value(self.modelo[iter[0]].iter, 0))
+		
 	def main_configure(self, widget, event):		
 		width, height = self.window.get_size()
 		x, y = self.window.get_position()
@@ -141,6 +170,39 @@ class player:
 	def main_focusout(self, widget, event):
 		self.app_cover.window.hide()
 
+	def main_keypress(self, widget, event):
+		keyval = event.keyval
+		name = gtk.gdk.keyval_name(keyval)
+		mod = gtk.accelerator_get_label(keyval, event.state)
+		print mod, keyval
+
+		if mod == "Ctrl+F":
+			self.xmms2_next()
+		elif mod == "Ctrl+A":
+			self.xmms2_prev()
+		elif mod == "Ctrl+S":
+			self.xmms2_pause()	
+		elif mod == "Ctrl+D":
+			self.xmms2_start()
+			
+	def xmms2_next(self):
+		self.xmms.playlist_set_next_rel(1)
+		self.xmms.playback_tickle()
+
+	def xmms2_prev(self):
+		self.xmms.playlist_set_next_rel(-1)
+		self.xmms.playback_tickle()
+
+	def xmms2_start(self):
+		self.xmms.playback_start()		
+
+	def xmms2_pause(self):
+		self.xmms.playback_pause()		
+
+	def xmms2_play(self, pos):
+		self.xmms.playlist_set_next_rel(0)
+		self.xmms.playback_tickle()
+		
 	def get_filename(self, url):		
 		n = url.split('/')
 

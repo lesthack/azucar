@@ -3,10 +3,10 @@
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="main">
-    <property name="width_request">400</property>
+    <property name="width_request">500</property>
     <property name="title" translatable="yes">xmms2me</property>
     <property name="window_position">center</property>
-    <property name="default_width">400</property>
+    <property name="default_width">500</property>
     <property name="opacity">0.90000000000000002</property>
     <child>
       <object class="GtkVBox" id="vbox1">
@@ -17,10 +17,9 @@
             <property name="height_request">20</property>
             <property name="visible">True</property>
             <property name="activity_mode">True</property>
-            <property name="text_xalign">0</property>
+            <property name="text_xalign">0.0099999997764825821</property>
             <property name="text_yalign">0</property>
-            <property name="fraction">0.90000000000000002</property>
-            <property name="text" translatable="yes"> 01:10 Evil Minds</property>
+            <property name="pulse_step">0.01</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -32,7 +31,6 @@
           <object class="GtkEntry" id="insearch">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="has_frame">False</property>
             <property name="invisible_char">&#x2022;</property>
           </object>
           <packing>
@@ -52,8 +50,9 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="headers_visible">False</property>
-                <property name="reorderable">True</property>
                 <property name="enable_search">False</property>
+                <property name="hover_selection">True</property>
+                <property name="enable_grid_lines">horizontal</property>
               </object>
             </child>
           </object>

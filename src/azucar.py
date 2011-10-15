@@ -38,10 +38,13 @@ xmms = xmmsclient.XMMS("azucar")
 try:
 	xmms.connect(os.getenv("XMMS_PATH"))
 except IOError, detail:
-	md = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE, "Connection failed: %s" % detail)
-	md.run()
-	md.destroy()
-	sys.exit(1)
+	print "Now connect to xmms2"
+	os.system("xmms2-launcher")
+	xmms.connect(os.getenv("XMMS_PATH"))
+	#md = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE, "Connection failed: %s" % detail)
+	#md.run()
+	#md.destroy()
+	#sys.exit(1)
 	
 def main():
 	conn = xmmsclient.glib.GLibConnector(xmms)
