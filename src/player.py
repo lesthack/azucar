@@ -32,12 +32,14 @@ class player:
 		self.current_song = ""
 		self.current_song_duration = 0
 		
-		self.modelo = gtk.ListStore (int, str)
+		self.modelo = gtk.ListStore (int, str, 'gboolean')
 		self.treeviewlist.set_model(self.modelo)
 		
 		render = gtk.CellRendererText() 
-		columna = gtk.TreeViewColumn ("name", render, text=1)
+		render.set_property('cell-background', '#ddd')
+		columna = gtk.TreeViewColumn ("name", render, text=1, cell_background_set=2)
 		self.treeviewlist.append_column(columna)
+		self.cellbackground = True
 
 	def __set_signals__(self):
 		self.insearch.connect("changed", self.search_song)
@@ -105,7 +107,9 @@ class player:
 
 	def add_track(self, result):
 		taginfo = self.get_taginfo(result.value())
-		self.modelo.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2])])
+		self.modelo.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])		
+		self.cellbackground = (True, False)[self.cellbackground==True]
+		
 
 	def get_taginfo(self, info):
 		track = []

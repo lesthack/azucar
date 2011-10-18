@@ -1,13 +1,13 @@
 
 [Anjuta]
-Fullscreen=1
-Geometry=1366x768+0+0
+Maximized=1
+Geometry=1341x722+0+0
 
 [Project Manager]
 Shortcut=C file:///home/lesthack/anjuta/azucar/src azucar %%%C file:///home/lesthack/anjuta/azucar/src azucar.py 
 
 [File Loader]
-Files=file:///home/lesthack/anjuta/azucar/src/azucar.py#47%%%file:///home/lesthack/anjuta/azucar/src/player.py#65%%%file:///home/lesthack/anjuta/azucar/data/cover.ui%%%file:///home/lesthack/anjuta/azucar/data/player.ui
+Files=file:///home/lesthack/anjuta/azucar/src/azucar.py#56%%%file:///home/lesthack/anjuta/azucar/src/player.py#39%%%file:///home/lesthack/anjuta/azucar/data/player.ui%%%file:///home/lesthack/anjuta/azucar/data/cover.ui
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
