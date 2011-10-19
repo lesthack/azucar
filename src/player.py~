@@ -160,20 +160,25 @@ class player:
 
 		self.treeviewlist.set_model(modeltemp)
 		
-	def treeviewlist_keypress(self, widget, event):
-		#sel = self.treeviewlist.get_selection().get_selected()
-		#print self.modelo.get_value(sel[1], 0)
-		
-		if event.keyval	in [65363]:			
-			#set cover
-			self.app_cover.set_artist("")
-			self.app_cover.set_song("")
-			self.app_cover.set_album("")
-			self.app_cover.window.show()
+	def treeviewlist_keypress(self, widget, event):				
+		if event.keyval	in [65363]:						
+			try:
+				sel = self.treeviewlist.get_selection().get_selected()
+				id = widget.get_model().get_value(sel[1], 0)
+				self.xmms.medialib_get_info(id, self.set_cover_information)
+			except:
+				pass			
 		else:
 		#elif event.keyval == 65307:
 			self.app_cover.window.hide()
 
+	def set_cover_information(self, result):
+		taginfo = self.get_taginfo(result.value())
+		self.app_cover.set_artist("Artist: %s" % taginfo[3])
+		self.app_cover.set_song("Song: %s" % taginfo[2])
+		self.app_cover.set_album("Album: %s" % taginfo[1])
+		self.app_cover.window.show()
+		
 	def treeviewlist_row_activated(self, widget, iter, path):
 		modelo = widget.get_model()
 		new_pos = self.get_song_position(int(modelo.get_value(modelo[iter[0]].iter, 0)))
@@ -194,6 +199,7 @@ class player:
 		keyval = event.keyval
 		name = gtk.gdk.keyval_name(keyval)
 		mod = gtk.accelerator_get_label(keyval, event.state)
+
 		#print mod, keyval
 
 		if mod == "Ctrl+F":
