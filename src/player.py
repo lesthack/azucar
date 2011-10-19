@@ -115,25 +115,30 @@ class player:
 	def get_taginfo(self, info):
 		track = []
 
-		track.append(info['id'])
+		try:
+				
+			track.append(info['id'])
 
-		if info.has_key('artist'):
-			track.append(info["artist"])
-		else:
-			track.append("No artist")
+			if info.has_key('artist'):
+				track.append(info["artist"])
+			else:
+				track.append("No artist")
 		
-		if info.has_key('title'):
-			track.append(info["title"])
-		else:
-			track.append(self.get_filename(info['url']))
+			if info.has_key('title'):
+				track.append(info["title"])
+			else:
+				track.append(self.get_filename(info['url']))
 
-		if info.has_key('album'):
-			track.append(info["album"])
-		else:
-			track.append("")
+			if info.has_key('album'):
+				track.append(info["album"])
+			else:
+				track.append("")
+
+		except:			
+			pass
 
 		return track
-			
+		
 	def initlogger(self):
 		self.logger = logging.getLogger('xmms2me')
 		hdlr = logging.FileHandler('xmms2me.log')
@@ -150,14 +155,14 @@ class player:
 		for i in self.modelo:						
 			match = re.search(r'%s' % widget.get_text().lower(), self.modelo.get_value(i.iter, 1).lower())
 			if match:
-				modeltemp.append([1, self.modelo.get_value(i.iter, 1), cellbackground])
+				modeltemp.append([self.modelo.get_value(i.iter, 0), self.modelo.get_value(i.iter, 1), cellbackground])
 				cellbackground = (True, False)[cellbackground==True]
 
 		self.treeviewlist.set_model(modeltemp)
 		
 	def treeviewlist_keypress(self, widget, event):
-		sel = self.treeviewlist.get_selection().get_selected()
-		print self.modelo.get_value(sel[1], 0)
+		#sel = self.treeviewlist.get_selection().get_selected()
+		#print self.modelo.get_value(sel[1], 0)
 		
 		if event.keyval	in [65363]:			
 			#set cover
@@ -170,7 +175,8 @@ class player:
 			self.app_cover.window.hide()
 
 	def treeviewlist_row_activated(self, widget, iter, path):
-		new_pos = self.get_song_position(int(self.modelo.get_value(self.modelo[iter[0]].iter, 0)))
+		modelo = widget.get_model()
+		new_pos = self.get_song_position(int(modelo.get_value(modelo[iter[0]].iter, 0)))
 		act_pos = self.get_song_position(self.current_song_id)
 		self.xmms2_play(new_pos-act_pos)
 		
@@ -188,7 +194,7 @@ class player:
 		keyval = event.keyval
 		name = gtk.gdk.keyval_name(keyval)
 		mod = gtk.accelerator_get_label(keyval, event.state)
-		#print mod, keyval
+		print mod, keyval
 
 		if mod == "Ctrl+F":
 			self.xmms2_next()
@@ -227,11 +233,11 @@ class player:
 
 		return name.replace('+',' ')
 
-	def get_song_position(self, pos):
-		npos = 0
-		if self.current_song_id > -1:
+	def get_song_position(self, id):
+		pos = 0
+		if id > -1:
 			for i in self.modelo:
-				if i[0] == pos:
-					return npos
-				npos+=1
+				if i[0] == id:
+					return pos
+				pos+=1
 		return -1
