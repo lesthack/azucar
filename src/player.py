@@ -29,6 +29,7 @@ class player:
 		self.treeviewlist = self.builder.get_object("treeviewlist")
 		self.insearch = self.builder.get_object("insearch")
 		self.playerbar = self.builder.get_object("playerbar")
+		self.playerbar.set_fraction(0)
 		self.current_song = ""
 		self.current_song_id = -1
 		self.current_song_duration = 0
@@ -95,10 +96,11 @@ class player:
 			
 	def set_track_player(self, result):
 		track = self.get_taginfo(result.value())
-		self.current_song_id = track[0]
-		self.current_song = "%s - %s" % (track[1],track[2])		
-		self.current_song_duration = result.value()['duration']				
-		
+		if track:
+			self.current_song_id = track[0]
+			self.current_song = "%s - %s" % (track[1],track[2])		
+			self.current_song_duration = result.value()['duration']				
+			
 	def remove_track(self, position):
 		self.modelo.remove(self.modelo[position].iter)
 		
@@ -161,13 +163,13 @@ class player:
 		self.treeviewlist.set_model(modeltemp)
 		
 	def treeviewlist_keypress(self, widget, event):				
-		if event.keyval	in [65363]:						
+		if event.keyval	in [65363]:									
 			try:
 				sel = self.treeviewlist.get_selection().get_selected()
 				id = widget.get_model().get_value(sel[1], 0)
 				self.xmms.medialib_get_info(id, self.set_cover_information)
 			except:
-				pass			
+				pass						
 		else:
 			self.app_cover.window.hide()
 
@@ -182,7 +184,8 @@ class player:
 		modelo = widget.get_model()
 		new_pos = self.get_song_position(int(modelo.get_value(modelo[iter[0]].iter, 0)))
 		act_pos = self.get_song_position(self.current_song_id)
-		self.xmms2_play(new_pos-act_pos)
+		
+		self.xmms2_play(new_pos-act_pos)		
 		
 	def main_configure(self, widget, event):		
 		width, height = self.window.get_size()
@@ -199,7 +202,7 @@ class player:
 		name = gtk.gdk.keyval_name(keyval)
 		mod = gtk.accelerator_get_label(keyval, event.state)
 
-		print mod, name, keyval
+		#print mod, name, keyval
 
 		if mod == "Ctrl+F":
 			self.xmms2_next()
@@ -224,14 +227,15 @@ class player:
 		self.xmms.playback_tickle()
 
 	def xmms2_start(self):
-		self.xmms.playback_start()		
+		self.xmms.playback_start()
 
 	def xmms2_pause(self):
 		self.xmms.playback_pause()		
 
 	def xmms2_play(self, pos):
+		self.xmms.playback_start()
 		self.xmms.playlist_set_next_rel(pos)
-		self.xmms.playback_tickle()
+		self.xmms.playback_tickle()		
 		
 	def get_filename(self, url):		
 		n = url.split('/')
