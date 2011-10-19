@@ -169,7 +169,6 @@ class player:
 			except:
 				pass			
 		else:
-		#elif event.keyval == 65307:
 			self.app_cover.window.hide()
 
 	def set_cover_information(self, result):
@@ -200,7 +199,7 @@ class player:
 		name = gtk.gdk.keyval_name(keyval)
 		mod = gtk.accelerator_get_label(keyval, event.state)
 
-		#print mod, keyval
+		print mod, name, keyval
 
 		if mod == "Ctrl+F":
 			self.xmms2_next()
@@ -210,7 +209,12 @@ class player:
 			self.xmms2_pause()	
 		elif mod == "Ctrl+D":
 			self.xmms2_start()
-			
+		elif mod == "Ctrl+C":
+			self.xmms2_clear()
+
+	def xmms2_clear(self):
+		self.xmms.playlist_clear()
+		
 	def xmms2_next(self):
 		self.xmms.playlist_set_next_rel(1)
 		self.xmms.playback_tickle()
