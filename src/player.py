@@ -30,6 +30,7 @@ class player:
 		self.insearch = self.builder.get_object("insearch")
 		self.playerbar = self.builder.get_object("playerbar")
 		self.current_song = ""
+		self.current_song_id = -1
 		self.current_song_duration = 0
 		
 		self.modelo = gtk.ListStore (int, str, 'gboolean')
@@ -94,8 +95,9 @@ class player:
 			
 	def set_track_player(self, result):
 		track = self.get_taginfo(result.value())
+		self.current_song_id = track[0]
 		self.current_song = "%s - %s" % (track[1],track[2])		
-		self.current_song_duration = result.value()['duration']
+		self.current_song_duration = result.value()['duration']				
 		
 	def remove_track(self, position):
 		self.modelo.remove(self.modelo[position].iter)
@@ -108,8 +110,7 @@ class player:
 	def add_track(self, result):
 		taginfo = self.get_taginfo(result.value())
 		self.modelo.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])		
-		self.cellbackground = (True, False)[self.cellbackground==True]
-		
+		self.cellbackground = (True, False)[self.cellbackground==True]		
 
 	def get_taginfo(self, info):
 		track = []
@@ -142,27 +143,36 @@ class player:
 		self.logger.setLevel(logging.INFO)
 
 	def search_song(self, widget):
-		modeltemp = gtk.ListStore (int, str)
+		modeltemp = gtk.ListStore (int, str, 'gboolean')
 
+		cellbackground = True
+		
 		for i in self.modelo:						
 			match = re.search(r'%s' % widget.get_text().lower(), self.modelo.get_value(i.iter, 1).lower())
 			if match:
-				modeltemp.append([1, self.modelo.get_value(i.iter, 1)])
+				modeltemp.append([1, self.modelo.get_value(i.iter, 1), cellbackground])
+				cellbackground = (True, False)[cellbackground==True]
 
 		self.treeviewlist.set_model(modeltemp)
 		
-	def treeviewlist_keypress(self, widget, event):				
-		if event.keyval	in [65293, 65364, 65362]:
-			self.app_cover.set_song("Esta es una canción mona: %s" % event.keyval)
+	def treeviewlist_keypress(self, widget, event):
+		sel = self.treeviewlist.get_selection().get_selected()
+		print self.modelo.get_value(sel[1], 0)
+		
+		if event.keyval	in [65363]:			
+			#set cover
+			self.app_cover.set_artist("")
+			self.app_cover.set_song("")
+			self.app_cover.set_album("")
 			self.app_cover.window.show()
-
-		elif event.keyval == 65307:
+		else:
+		#elif event.keyval == 65307:
 			self.app_cover.window.hide()
 
 	def treeviewlist_row_activated(self, widget, iter, path):
-		#print self.modelo[iter[0]].iter
-		print self.modelo.get_value(self.modelo[iter[0]].iter, 0)
-		self.xmms2_play(self.modelo.get_value(self.modelo[iter[0]].iter, 0))
+		new_pos = self.get_song_position(int(self.modelo.get_value(self.modelo[iter[0]].iter, 0)))
+		act_pos = self.get_song_position(self.current_song_id)
+		self.xmms2_play(new_pos-act_pos)
 		
 	def main_configure(self, widget, event):		
 		width, height = self.window.get_size()
@@ -178,7 +188,7 @@ class player:
 		keyval = event.keyval
 		name = gtk.gdk.keyval_name(keyval)
 		mod = gtk.accelerator_get_label(keyval, event.state)
-		print mod, keyval
+		#print mod, keyval
 
 		if mod == "Ctrl+F":
 			self.xmms2_next()
@@ -204,7 +214,7 @@ class player:
 		self.xmms.playback_pause()		
 
 	def xmms2_play(self, pos):
-		self.xmms.playlist_set_next_rel(10)
+		self.xmms.playlist_set_next_rel(pos)
 		self.xmms.playback_tickle()
 		
 	def get_filename(self, url):		
@@ -216,4 +226,12 @@ class player:
 		    name = ""
 
 		return name.replace('+',' ')
-    
+
+	def get_song_position(self, pos):
+		npos = 0
+		if self.current_song_id > -1:
+			for i in self.modelo:
+				if i[0] == pos:
+					return npos
+				npos+=1
+		return -1
