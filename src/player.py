@@ -123,7 +123,10 @@ class player:
 			self.current_song_duration = result.value()['duration']				
 			
 	def remove_track(self, position):
-		self.modelo.remove(self.modelo[position].iter)
+		try:
+			self.modelo.remove(self.modelo[position].iter)
+		except:
+			print "Can't remove position: ", position
 		
 	def get_tracks(self, result):
 		playlist = result.value()
@@ -132,8 +135,11 @@ class player:
 
 	def add_track(self, result):
 		taginfo = self.get_taginfo(result.value())
-		self.modelo.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])		
-		self.cellbackground = (True, False)[self.cellbackground==True]		
+		try:
+			self.modelo.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])		
+			self.cellbackground = (True, False)[self.cellbackground==True]
+		except:
+			print "Can't to append: ", result.value()
 
 	def get_taginfo(self, info):
 		track = []
@@ -195,7 +201,7 @@ class player:
 
 	def set_cover_information(self, result):
 		url = result.value()['url'][7:].replace('+',' ')
-		
+		print url
 		for symbol in self.symbols:
 			url = url.replace(symbol, self.symbols[symbol])
 
@@ -231,6 +237,39 @@ class player:
 		if mod == "Ctrl+O":
 			self.xmms2_open()
 
+	def xmms2_open(self):
+		
+		dialog = gtk.FileChooserDialog("Add Music Files..",
+			None,
+			gtk.FILE_CHOOSER_ACTION_OPEN,
+			(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+			gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+
+		dialog.set_default_response(gtk.RESPONSE_OK)
+		dialog.set_select_multiple(True)
+		#dialog.set_current_folder("~/")
+		
+		filter = gtk.FileFilter()
+		filter.set_name("Music files")
+		filter.add_pattern("*.mp3")
+		dialog.add_filter(filter)
+		
+		response = dialog.run()
+
+		if response == gtk.RESPONSE_OK:
+			for ifile in dialog.get_filenames():
+				try:
+					for symbol in self.symbols:
+						ifile = ifile.replace(self.symbols[symbol], symbol)
+					print ifile.replace(' ','+')
+					self.xmms.playlist_add_encoded('file://%s' % ifile.replace(' ','+'))
+				except:
+					print "Error to adding file %s" % ifile
+		elif response == gtk.RESPONSE_CANCEL:
+			print 'Closed, no files selected'
+
+		dialog.destroy()
+			
 	def xmms2_clear(self):
 		self.xmms.playlist_clear()
 		
@@ -281,37 +320,6 @@ class player:
 		keybinder.bind(key_clear, self.xmms2_clear)
 		#key_sup = "<Ctrl><Alt>O"		
 		#keybinder.bind(key_sup, self.xmms2_open)
-		
-	def xmms2_open(self):
-		
-		dialog = gtk.FileChooserDialog("Add Music Files..",
-			None,
-			gtk.FILE_CHOOSER_ACTION_OPEN,
-			(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-			gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-
-		dialog.set_default_response(gtk.RESPONSE_OK)
-		dialog.set_select_multiple(True)
-		
-		filter = gtk.FileFilter()
-		filter.set_name("Music files")
-		filter.add_pattern("*.mp3")
-		dialog.add_filter(filter)
-		
-		response = dialog.run()
-
-		if response == gtk.RESPONSE_OK:
-			for ifile in dialog.get_filenames():
-				try:
-					for symbol in self.symbols:
-						ifile = ifile.replace(self.symbols[symbol], symbol)
-					self.xmms.playlist_add_encoded('file://%s' % ifile.replace(' ','+'))
-				except:
-					print "Error to adding file %s" % ifile
-		elif response == gtk.RESPONSE_CANCEL:
-			print 'Closed, no files selected'
-
-		dialog.destroy()
 		
 	def get_song_position(self, id):
 		pos = 0
