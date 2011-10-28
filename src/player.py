@@ -84,11 +84,20 @@ class player:
 			self.remove_track(update['position'])
 		elif update['type']==4: #clear
 			self.modelo.clear()
+			self.treeviewlist.set_model(self.modelo)
 		elif update['type']==5: #change positions
 			self.modelo.swap(self.modelo[update['position']].iter, self.modelo[update['newposition']].iter)
 
-	def handler_playback_current_id(self, result):		
+	def handler_playback_current_id(self, result):						
 		self.xmms.medialib_get_info(result.value(), self.set_track_player)
+
+		# Select Row 		
+		try:
+			miter = self.get_iter(result.value())
+			if miter and self.modelo == self.treeviewlist.get_model():
+				self.treeviewlist.get_selection().select_iter(miter)
+		except:
+			print "Ocurrio un error al tratar de obtener la seleccion"
 
 	def handler_set_time_track(self, result):
 		total = result.value()
@@ -180,15 +189,26 @@ class player:
 		self.treeviewlist.set_model(modeltemp)
 		
 	def treeviewlist_keypress(self, widget, event):
-		if event.keyval	in [65363]:
-			try:
-				sel = self.treeviewlist.get_selection().get_selected()
-				id = widget.get_model().get_value(sel[1], 0)
-				self.xmms.medialib_get_info(id, self.set_cover_information)
-			except:
-				pass						
-		else:
-			self.app_cover.window.hide()
+		try:
+			sel = self.treeviewlist.get_selection().get_selected()
+			id = widget.get_model().get_value(sel[1], 0)				
+
+			if event.keyval	in [65363]: # Show Cover			
+				try:								
+					self.xmms.medialib_get_info(id, self.set_cover_information)
+				except:
+					print "Ocurrio un error en treeviewlist_keypress"						
+			elif event.keyval == 65535: # Delete Item			
+				try:								
+					pos = self.get_song_position(id)
+					self.xmms.playlist_remove_entry(pos,'_active')
+					self.treeviewlist.set_model(self.modelo)
+				except:
+					print "Ocurrio un error al tratar de eliminar un item"
+			else:
+				self.app_cover.window.hide()
+		except:
+			return
 
 	def set_cover_information(self, result):
 		try:
@@ -320,3 +340,9 @@ class player:
 					return pos
 				pos+=1
 		return 0
+
+	def get_iter(self, id):
+		for it in self.modelo:
+			if it[0] == id:
+				return it.iter
+		return None
