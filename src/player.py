@@ -46,7 +46,12 @@ class player:
 					'%c3%93':'Ó', '%c3%9a':'Ú', '%c3%a4':'ä', '%c3%ab':'ë', 
 					'%c3%af':'ï', '%c3%b6':'ö', '%c3%bc':'ü', '%c3%84':'Ä', 
 					'%c3%8b':'Ë', '%c3%8f':'Ï', '%c3%96':'Ö', '%c3%9c':'Ü'}
-						
+
+		self.supported = ( 'mp1', 'mp2', 'mp3', 'm4a', 'm4p', 'ogg', 'flac', 'asf', 'wma', 'wav',
+					'mpg', 'mpeg', 'm4v', 'mp4', 'avi', 'ogm', 'wmv',
+					'mod', 'ape', 'apl', 'm4b', 'm4v', 'm4r', '3gp', 'aac', 
+					'mpc', 'mp+', 'mpp', 'oga', 'sid')
+			
 		self.current_song = ""
 		self.current_song_duration = 0
 		self.status = None
@@ -200,19 +205,10 @@ class player:
 			self.app_cover.window.hide()
 
 	def set_cover_information(self, result):
-		#url = result.value()['url'][7:].replace('+',' ')
-
 		try:
 			url_cover = "%s/.config/xmms2/bindata/%s" % (os.getenv("HOME"), result.value()['picture_front'])
 		except:
 			url_cover = "data/no-cover.jpg"
-
-		
-
-		#return
-		#print url
-		#for symbol in self.symbols:
-		#	url = url.replace(symbol, self.symbols[symbol])
 
 		taginfo = self.get_taginfo(result.value())
 		self.app_cover.set_artist("Artist: %s" % taginfo[1])
@@ -260,7 +256,10 @@ class player:
 		
 		filter = gtk.FileFilter()
 		filter.set_name("Music files")
-		filter.add_pattern("*.mp3")
+
+		for format in self.supported:
+			filter.add_pattern("*.%s" % format)
+
 		dialog.add_filter(filter)
 		
 		response = dialog.run()

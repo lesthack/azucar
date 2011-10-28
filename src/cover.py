@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import gtk
-from mutagen import File
+#from mutagen import File
 
 UI_FILE = "data/cover.ui"
 
@@ -29,18 +29,3 @@ class cover:
 		pixbuf = gtk.gdk.pixbuf_new_from_file(url)
 		scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
 		self.image.set_from_pixbuf(scaled_buf)
-		#try:
-			#media = File(url)
-			#artwork = media.tags['APIC:'].data 
-			#with open('data/.image.jpg', 'wb') as img:
-			#	img.write(artwork)
-			#pixbuf = gtk.gdk.pixbuf_new_from_file("data/.image.jpg")	
-			#self.image.show()
-		#except:
-		#	pixbuf = gtk.gdk.pixbuf_new_from_file("data/no-cover.jpg")
-		#	scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
-		#	self.image.set_from_pixbuf(scaled_buf)
-			#print "No pudo cargar la imagen"
-
-
-			
