@@ -46,7 +46,7 @@ class player:
 					'%c3%93':'Ó', '%c3%9a':'Ú', '%c3%a4':'ä', '%c3%ab':'ë', 
 					'%c3%af':'ï', '%c3%b6':'ö', '%c3%bc':'ü', '%c3%84':'Ä', 
 					'%c3%8b':'Ë', '%c3%8f':'Ï', '%c3%96':'Ö', '%c3%9c':'Ü'}
-
+						
 		self.current_song = ""
 		self.current_song_duration = 0
 		self.status = None
@@ -200,16 +200,25 @@ class player:
 			self.app_cover.window.hide()
 
 	def set_cover_information(self, result):
-		url = result.value()['url'][7:].replace('+',' ')
-		print url
-		for symbol in self.symbols:
-			url = url.replace(symbol, self.symbols[symbol])
+		#url = result.value()['url'][7:].replace('+',' ')
+		print os.getenv("HOME")
+		try:
+			url_cover = "~/.config/xmms2/bindata/%s" % (result.value()['picture_front'])
+		except:
+			url_cover = "data/no-cover.jpg"
+
+		
+
+		#return
+		#print url
+		#for symbol in self.symbols:
+		#	url = url.replace(symbol, self.symbols[symbol])
 
 		taginfo = self.get_taginfo(result.value())
 		self.app_cover.set_artist("Artist: %s" % taginfo[1])
 		self.app_cover.set_song("%s" % taginfo[2])
 		self.app_cover.set_album("Album: %s" % taginfo[3])
-		self.app_cover.set_url(url)
+		self.app_cover.set_url(url_cover)
 		self.app_cover.window.show()
 
 	def treeviewlist_row_activated(self, widget, iter, path):
@@ -259,9 +268,7 @@ class player:
 		if response == gtk.RESPONSE_OK:
 			for ifile in dialog.get_filenames():
 				try:
-					for symbol in self.symbols:
-						ifile = ifile.replace(self.symbols[symbol], symbol)
-					self.xmms.playlist_add_encoded('file://%s' % ifile.replace(' ','+'))
+					self.xmms.playlist_add_url('file://%s' % ifile)
 				except:
 					print "Error to adding file %s" % ifile
 		elif response == gtk.RESPONSE_CANCEL:
