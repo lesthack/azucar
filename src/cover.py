@@ -26,6 +26,11 @@ class cover:
 		self.song.set_text(_song)
 
 	def set_url(self, url):
-		pixbuf = gtk.gdk.pixbuf_new_from_file(url)
-		scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
-		self.image.set_from_pixbuf(scaled_buf)
+		try:
+			pixbuf = gtk.gdk.pixbuf_new_from_file(url)
+			scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
+			self.image.set_from_pixbuf(scaled_buf)
+		except:
+			pixbuf = gtk.gdk.pixbuf_new_from_file("data/no-cover.jpg")
+			scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
+			self.image.set_from_pixbuf(scaled_buf)
