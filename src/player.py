@@ -23,7 +23,7 @@ class player:
 		self.__properties__()
 		self.__set_signals__()
 		self.__set_hotkeys__()
-		
+
 		#self.initlogger()
 		#self.logger.info('Iniciando Actividad')
 		
@@ -242,6 +242,7 @@ class player:
 		keyval = event.keyval
 		name = gtk.gdk.keyval_name(keyval)
 		mod = gtk.accelerator_get_label(keyval, event.state)
+		mod = mod.replace("+Mod2","")
 
 		#print mod, name, keyval
 
