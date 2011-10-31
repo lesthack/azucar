@@ -84,7 +84,7 @@ class player:
 			self.remove_track(update['position'])
 		elif update['type']==4: #clear
 			self.modelo.clear()
-			self.treeviewlist.set_model(self.model)
+			self.treeviewlist.set_model(self.modelo)
 		elif update['type']==5: #change positions
 			self.modelo.swap(self.modelo[update['position']].iter, self.modelo[update['newposition']].iter)
 
@@ -247,6 +247,8 @@ class player:
 
 		if mod == "Ctrl+O":
 			self.xmms2_open()
+		elif mod == "Ctrl+L":
+			self.xmms2_clear()
 
 	def xmms2_open(self):
 		
@@ -292,14 +294,14 @@ class player:
 		self.xmms.playlist_set_next_rel(-1)
 		self.xmms.playback_tickle()
 
-	def xmms2_start(self):
-		self.xmms.playback_start()
+	#def xmms2_start(self):
+	#	self.xmms.playback_start()
 
-	def xmms2_pause(self):
-		self.xmms.playback_pause()		
+	#def xmms2_pause(self):
+	#	self.xmms.playback_pause()		
 
-	def xmms2_stop(self):
-		self.xmms.playback_stop()		
+	#def xmms2_stop(self):
+	#	self.xmms.playback_stop()		
 		
 	def xmms2_play(self, pos):		
 		self.xmms.playlist_set_next(pos)
@@ -324,13 +326,11 @@ class player:
 		key_prev = "<Ctrl><Alt>Z"		
 		keybinder.bind(key_prev, self.xmms2_prev)
 		key_start = "<Ctrl><Alt>C"		
-		keybinder.bind(key_start, self.xmms2_start)
+		keybinder.bind(key_start, self.xmms.playback_start)
 		key_pause = "<Ctrl><Alt>X"		
-		keybinder.bind(key_pause, self.xmms2_pause)
-		key_clear = "<Ctrl><Alt>B"		
-		keybinder.bind(key_clear, self.xmms2_clear)
-		#key_sup = "<Ctrl><Alt>O"		
-		#keybinder.bind(key_sup, self.xmms2_open)
+		keybinder.bind(key_pause, self.xmms.playback_pause)
+		key_clear = "<Ctrl><Alt>B"
+		keybinder.bind(key_clear, self.xmms.playback_stop)
 		
 	def get_song_position(self, id):
 		pos = 0
