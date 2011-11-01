@@ -46,7 +46,7 @@ class player:
 		self.treeviewlist.set_model(self.modelo)
 		
 		render = gtk.CellRendererText() 
-		render.set_property('cell-background', '#ddd')
+		render.set_property('cell-background', '#eee')
 		columna = gtk.TreeViewColumn ("name", render, text=1, cell_background_set=2)
 		self.treeviewlist.append_column(columna)
 		self.cellbackground = True
@@ -60,7 +60,7 @@ class player:
 		self.window.connect("focus-out-event", self.main_focusout)
 		self.window.connect("destroy", gtk.main_quit)
 		try:
-			self.xmms.playback_current_id(self.handler_playback_current_id)		
+			self.xmms.playback_current_id(self.handler_playback_current_id)
 			self.xmms.playlist_list_entries('_active', self.get_tracks)				
 			self.xmms.signal_playback_playtime(self.handler_set_time_track)
 			self.xmms.playback_status(self.handler_playback_status)
@@ -93,15 +93,16 @@ class player:
 
 	def handler_playback_current_id(self, result):						
 		self.xmms.medialib_get_info(result.value(), self.set_track_player)
+		self.__select_row__(result.value())
 
-		# Select Row 		
+	def __select_row__(self, id):
 		try:
-			miter = self.get_iter(result.value())
+			miter = self.get_iter(id)
 			if miter and self.modelo == self.treeviewlist.get_model():
 				self.treeviewlist.get_selection().select_iter(miter)
 		except:
-			self.logger.error('to get selection: handler_playback_current_id')
-
+			self.logger.error('to get selection: __select_row__')
+		
 	def handler_set_time_track(self, result):
 		total = result.value()
 		min = total/(60*1000)
@@ -116,8 +117,10 @@ class player:
 		
 		if self.current_song_duration > 0:
 			progress = (int(total)*100/int(self.current_song_duration))/100.0			
-
-		self.playerbar.set_fraction(progress)
+		try:
+			self.playerbar.set_fraction(progress)
+		except Exception:
+			self.logger.error("%s" % Exception)
 			
 	def set_track_player(self, result):
 		track = self.get_taginfo(result.value())
@@ -142,7 +145,7 @@ class player:
 			self.modelo.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])		
 			self.cellbackground = (True, False)[self.cellbackground==True]
 		except:
-			self.logger.error("Can't to append: " % result.value())
+			self.logger.error("Can't to append: %s" % result.value())
 
 	def get_taginfo(self, info):
 		track = []
@@ -237,7 +240,7 @@ class player:
 		x, y = self.window.get_position()
 		
 		self.window.get_position()
-		self.app_cover.window.move(x+width+5,y+60)
+		self.app_cover.window.move(x+width+7,y+60)
 
 	def main_focusout(self, widget, event):
 		self.app_cover.window.hide()
@@ -252,11 +255,15 @@ class player:
 		#print mod, name, keyval
 
 		if mod == "Ctrl+O":
-			self.xmms2_open()
+			self.xmms2_open_files()
+		elif mod == "Ctrl+P":
+			self.xmms2_open_directory()
 		elif mod == "Ctrl+L":
 			self.xmms2_clear()
+		elif mod == "Ctrl+I":
+			self.xmms.playback_current_id(self.handler_playback_current_id)
 
-	def xmms2_open(self):
+	def xmms2_open_files(self):
 		
 		dialog = gtk.FileChooserDialog("Add Music Files..",
 			None,
@@ -288,7 +295,40 @@ class player:
 			self.logger.info("Closed, no files selected")
 
 		dialog.destroy()
-			
+
+	def xmms2_open_directory(self):
+		
+		dialog = gtk.FileChooserDialog("Add Music Directory..",
+			None,
+			gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+			(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+			gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+
+		dialog.set_default_response(gtk.RESPONSE_OK)
+		dialog.set_select_multiple(True)
+		dialog.set_current_folder(os.getenv("HOME"))
+
+		filter = gtk.FileFilter()
+		filter.set_name("Music files")
+
+		for format in self.supported:
+			filter.add_pattern("*.%s" % format)
+
+		dialog.add_filter(filter)
+		
+		response = dialog.run()
+
+		if response == gtk.RESPONSE_OK:
+			for idir in dialog.get_filenames():
+				try:
+					self.xmms.playlist_radd('file://%s' % idir)
+				except:
+					self.logger.error("Error to adding file %s" % ifile)
+		elif response == gtk.RESPONSE_CANCEL:
+			self.logger.info("Closed, no files selected")
+
+		dialog.destroy()
+		
 	def xmms2_clear(self):
 		self.xmms.playlist_clear()
 		
@@ -328,6 +368,11 @@ class player:
 		keybinder.bind(key_pause, self.xmms.playback_pause)
 		key_clear = "<Ctrl><Alt>B"
 		keybinder.bind(key_clear, self.xmms.playback_stop)
+		key_focus = "<Ctrl><Alt>M"
+		keybinder.bind(key_focus, self.get_focus)
+
+	def get_focus(self):
+		print self.window.props.is_active
 		
 	def get_song_position(self, id):
 		pos = 0
