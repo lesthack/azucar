@@ -27,10 +27,15 @@ class player:
 		self.__set_signals__()
 		self.__set_hotkeys__()
 		
-	def __properties__(self):
-		self.treeviewlist = self.builder.get_object("treeviewlist")
+	def __properties__(self):		
+		self.panel_active = self.builder.get_object("panel_active")
+		self.scrollplaylist = self.builder.get_object("scrollplaylist")
+		self.list_active = self.builder.get_object("list_active")
 		self.insearch = self.builder.get_object("insearch")
-		self.playerbar = self.builder.get_object("playerbar")
+		self.playerbar = self.builder.get_object("playerbar")				
+
+		self.panel_artists = self.builder.get_object("panel_artists")
+		
 		self.playerbar.set_fraction(0)
 		
 		self.supported = ( 'mp1', 'mp2', 'mp3', 'm4a', 'm4p', 'ogg', 'flac', 'asf', 'wma', 'wav',
@@ -43,18 +48,18 @@ class player:
 		self.status = None
 		
 		self.modelo = gtk.ListStore (int, str, 'gboolean')
-		self.treeviewlist.set_model(self.modelo)
+		self.list_active.set_model(self.modelo)
 		
 		render = gtk.CellRendererText() 
 		render.set_property('cell-background', '#eee')
 		columna = gtk.TreeViewColumn ("name", render, text=1, cell_background_set=2)
-		self.treeviewlist.append_column(columna)
+		self.list_active.append_column(columna)
 		self.cellbackground = True
 
 	def __set_signals__(self):
 		self.insearch.connect("changed", self.search_song)
-		self.treeviewlist.connect("key-press-event", self.treeviewlist_keypress)
-		self.treeviewlist.connect("row-activated", self.treeviewlist_row_activated)
+		self.list_active.connect("key-press-event", self.list_active_keypress)
+		self.list_active.connect("row-activated", self.list_active_row_activated)
 		self.window.connect("key-press-event", self.main_keypress)
 		self.window.connect("configure-event", self.main_configure)
 		self.window.connect("focus-out-event", self.main_focusout)
@@ -87,7 +92,7 @@ class player:
 			self.remove_track(update['position'])
 		elif update['type']==4: #clear
 			self.modelo.clear()
-			self.treeviewlist.set_model(self.modelo)
+			self.list_active.set_model(self.modelo)
 		elif update['type']==5: #change positions
 			self.modelo.swap(self.modelo[update['position']].iter, self.modelo[update['newposition']].iter)
 
@@ -98,8 +103,8 @@ class player:
 	def __select_row__(self, id):
 		try:
 			miter = self.get_iter(id)
-			if miter and self.modelo == self.treeviewlist.get_model():
-				self.treeviewlist.get_selection().select_iter(miter)
+			if miter and self.modelo == self.list_active.get_model():
+				self.list_active.get_selection().select_iter(miter)
 		except:
 			self.logger.error('to get selection: __select_row__')
 		
@@ -192,24 +197,24 @@ class player:
 				modeltemp.append([self.modelo.get_value(i.iter, 0), self.modelo.get_value(i.iter, 1), cellbackground])
 				cellbackground = (True, False)[cellbackground==True]
 
-		self.treeviewlist.set_model(modeltemp)
+		self.list_active.set_model(modeltemp)
 		
-	def treeviewlist_keypress(self, widget, event):
+	def list_active_keypress(self, widget, event):
 		try:
-			sel = self.treeviewlist.get_selection().get_selected()
+			sel = self.list_active.get_selection().get_selected()
 			id = widget.get_model().get_value(sel[1], 0)				
 
 			if event.keyval	in [65363]: # Show Cover			
 				try:								
 					self.xmms.medialib_get_info(id, self.set_cover_information)
 				except:
-					self.logger.error("in treeviewlist_keypress")
+					self.logger.error("in list_active_keypress")
 					
 			elif event.keyval == 65535: # Delete Item			
 				try:								
 					pos = self.get_song_position(id)
 					self.xmms.playlist_remove_entry(pos,'_active')
-					self.treeviewlist.set_model(self.modelo)
+					self.list_active.set_model(self.modelo)
 				except:
 					self.logger.error("in remove item to playlist")					
 			else:
@@ -230,7 +235,7 @@ class player:
 		self.app_cover.set_url(url_cover)
 		self.app_cover.window.show()
 
-	def treeviewlist_row_activated(self, widget, iter, path):
+	def list_active_row_activated(self, widget, iter, path):
 		modelo = widget.get_model()
 		new_pos = self.get_song_position(int(modelo.get_value(modelo[iter[0]].iter, 0)))		
 		self.xmms2_play(new_pos)
@@ -262,7 +267,19 @@ class player:
 			self.xmms2_clear()
 		elif mod == "Ctrl+I":
 			self.xmms.playback_current_id(self.handler_playback_current_id)
+		elif mod == "Ctrl+J":
+			self.trans_change_left()
+		elif mod == "Ctrl+K":
+			self.trans_change_right()
 
+	def trans_change_left(self):		
+		self.panel_artists.set_visible(True)
+		self.panel_active.set_visible(False)
+
+	def trans_change_right(self):
+		self.panel_artists.set_visible(False)
+		self.panel_active.set_visible(True)
+	
 	def xmms2_open_files(self):
 		
 		dialog = gtk.FileChooserDialog("Add Music Files..",
