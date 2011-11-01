@@ -7,8 +7,6 @@ import re
 import os
 import keybinder
 from cover import *
-#import pygtk
-#import logging
 
 UI_FILE = "data/player.ui"
 
