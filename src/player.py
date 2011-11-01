@@ -6,24 +6,26 @@ import gtk
 import re
 import os
 import keybinder
+import logging
 from cover import *
 
 UI_FILE = "data/player.ui"
 
 class player:
 	def __init__(self, xmms):
+		self.initlogger()
+
+		self.xmms = xmms
+		self.logger.info('azucar init')
+		
 		self.builder = gtk.Builder()
 		self.builder.add_from_file(UI_FILE)
-		self.window = self.builder.get_object("main")		
-		self.xmms = xmms
+		self.window = self.builder.get_object("main")				
 		self.app_cover = cover()
 					
 		self.__properties__()
 		self.__set_signals__()
 		self.__set_hotkeys__()
-
-		#self.initlogger()
-		#self.logger.info('Iniciando Actividad')
 		
 	def __properties__(self):
 		self.treeviewlist = self.builder.get_object("treeviewlist")
@@ -57,13 +59,16 @@ class player:
 		self.window.connect("configure-event", self.main_configure)
 		self.window.connect("focus-out-event", self.main_focusout)
 		self.window.connect("destroy", gtk.main_quit)
-		self.xmms.playback_current_id(self.handler_playback_current_id)		
-		self.xmms.playlist_list_entries('_active', self.get_tracks)				
-		self.xmms.signal_playback_playtime(self.handler_set_time_track)
-		self.xmms.playback_status(self.handler_playback_status)
-		self.xmms.broadcast_playlist_changed(self.handler_playlist_change)
-		self.xmms.broadcast_playback_current_id(self.handler_playback_current_id)
-		self.xmms.broadcast_playback_status(self.handler_playback_status)
+		try:
+			self.xmms.playback_current_id(self.handler_playback_current_id)		
+			self.xmms.playlist_list_entries('_active', self.get_tracks)				
+			self.xmms.signal_playback_playtime(self.handler_set_time_track)
+			self.xmms.playback_status(self.handler_playback_status)
+			self.xmms.broadcast_playlist_changed(self.handler_playlist_change)
+			self.xmms.broadcast_playback_current_id(self.handler_playback_current_id)
+			self.xmms.broadcast_playback_status(self.handler_playback_status)
+		except:
+			self.logger.critical("Error in hanlder's to xmms2")
 
 	def handler_playback_status(self, result):
 		self.status = result.value()
@@ -95,7 +100,7 @@ class player:
 			if miter and self.modelo == self.treeviewlist.get_model():
 				self.treeviewlist.get_selection().select_iter(miter)
 		except:
-			print "Ocurrio un error al tratar de obtener la seleccion"
+			self.logger.error('to get selection: handler_playback_current_id')
 
 	def handler_set_time_track(self, result):
 		total = result.value()
@@ -124,7 +129,7 @@ class player:
 		try:
 			self.modelo.remove(self.modelo[position].iter)
 		except:
-			print "Can't remove position: ", position
+			self.logger.error("Can't remove position: %s" % position)
 		
 	def get_tracks(self, result):
 		playlist = result.value()
@@ -137,7 +142,7 @@ class player:
 			self.modelo.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])		
 			self.cellbackground = (True, False)[self.cellbackground==True]
 		except:
-			print "Can't to append: ", result.value()
+			self.logger.error("Can't to append: " % result.value())
 
 	def get_taginfo(self, info):
 		track = []
@@ -195,14 +200,15 @@ class player:
 				try:								
 					self.xmms.medialib_get_info(id, self.set_cover_information)
 				except:
-					print "Ocurrio un error en treeviewlist_keypress"						
+					self.logger.error("in treeviewlist_keypress")
+					
 			elif event.keyval == 65535: # Delete Item			
 				try:								
 					pos = self.get_song_position(id)
 					self.xmms.playlist_remove_entry(pos,'_active')
 					self.treeviewlist.set_model(self.modelo)
 				except:
-					print "Ocurrio un error al tratar de eliminar un item"
+					self.logger.error("in remove item to playlist")					
 			else:
 				self.app_cover.window.hide()
 		except:
@@ -239,6 +245,7 @@ class player:
 	def main_keypress(self, widget, event):
 		keyval = event.keyval
 		name = gtk.gdk.keyval_name(keyval)
+
 		mod = gtk.accelerator_get_label(keyval, event.state)
 		mod = mod.replace("+Mod2","")
 
@@ -276,9 +283,9 @@ class player:
 				try:
 					self.xmms.playlist_add_url('file://%s' % ifile)
 				except:
-					print "Error to adding file %s" % ifile
+					self.logger.error("Error to adding file %s" % ifile)
 		elif response == gtk.RESPONSE_CANCEL:
-			print 'Closed, no files selected'
+			self.logger.info("Closed, no files selected")
 
 		dialog.destroy()
 			
@@ -292,15 +299,6 @@ class player:
 	def xmms2_prev(self):
 		self.xmms.playlist_set_next_rel(-1)
 		self.xmms.playback_tickle()
-
-	#def xmms2_start(self):
-	#	self.xmms.playback_start()
-
-	#def xmms2_pause(self):
-	#	self.xmms.playback_pause()		
-
-	#def xmms2_stop(self):
-	#	self.xmms.playback_stop()		
 		
 	def xmms2_play(self, pos):		
 		self.xmms.playlist_set_next(pos)
