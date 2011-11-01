@@ -19,13 +19,28 @@
 
 import sys
 import os
-from player import *
+import gobject
+
+try:
+    __file__
+except NameError:
+    pass
+else:
+    libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'src'))
+    sys.path.insert(0, libdir)
+
+from player import player
 
 try:
     import gtk
 except ImportError:
     sys.exit("pygtk not found.")
 
+try:
+	import keybinder
+except:
+	sys.exit("python-keybinder not found.")
+	
 try:
 	import xmmsclient
 	import xmmsclient.glib
@@ -37,14 +52,20 @@ xmms = xmmsclient.XMMS("azucar")
 
 try:
 	xmms.connect(os.getenv("XMMS_PATH"))
+	status = True 
 except IOError, detail:
-	print "Now connect to xmms2"
-	os.system("xmms2-launcher")
-	xmms.connect(os.getenv("XMMS_PATH"))
-	#md = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE, "Connection failed: %s" % detail)
-	#md.run()
-	#md.destroy()
-	#sys.exit(1)
+	status = False
+
+if not status:
+	try:
+		os.system("xmms2-launcher")
+		xmms.connect(os.getenv("XMMS_PATH"))
+	except:
+		sys.exit("xmms2 server not found")
+try:
+	import logging
+except ImportError:
+	sys.exit("loggin not found")
 	
 def main():
 	conn = xmmsclient.glib.GLibConnector(xmms)
