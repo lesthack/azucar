@@ -8,7 +8,7 @@ import re
 import os
 import keybinder
 import logging
-from cover import *
+#from cover import *
 
 UI_FILE = "data/player.ui"
 
@@ -43,13 +43,15 @@ class player:
 		self.image_cover = self.builder.get_object("cover_image")
 		self.timer = self.builder.get_object("lb_timer")
 
-		attr = pango.AttrList()
-		size = pango.AttrSize(20000, 0, -1)
-		weight = pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)
-		attr.insert(size)
-		attr.insert(weight)
-		
-		self.timer.set_attributes(attr)
+		attr_timer = pango.AttrList()
+		attr_timer.insert(pango.AttrSize(20000, 0, -1)) #font size
+		attr_timer.insert(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)) #font weight		
+		self.timer.set_attributes(attr_timer)
+
+		attr_song = pango.AttrList()
+		attr_song.insert(pango.AttrSize(14000, 0, -1)) #font size
+		attr_song.insert(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)) #font weight		
+		self.song.set_attributes(attr_song)
 		
 		self.playerbar.set_fraction(0)
 		
