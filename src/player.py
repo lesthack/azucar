@@ -52,6 +52,15 @@ class player:
 		attr_song.insert(pango.AttrSize(14000, 0, -1)) #font size
 		attr_song.insert(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)) #font weight		
 		self.song.set_attributes(attr_song)
+
+		# buttons
+		self.bt_next = self.builder.get_object("bt_next")
+		self.bt_prev = self.builder.get_object("bt_prev")
+		self.bt_play = self.builder.get_object("bt_play")
+		self.bt_pause = self.builder.get_object("bt_pause")
+		self.bt_stop = self.builder.get_object("bt_stop")
+		self.bt_albums = self.builder.get_object("bt_albums")
+		self.bt_options = self.builder.get_object("bt_options")
 		
 		self.playerbar.set_fraction(0)
 		
@@ -81,6 +90,12 @@ class player:
 		#self.window.connect("configure-event", self.main_configure)
 		#self.window.connect("focus-out-event", self.main_focusout)
 		self.window.connect("destroy", gtk.main_quit)
+		self.bt_next.connect("clicked", self.xmms2_next)
+		self.bt_prev.connect("clicked", self.xmms2_prev)
+		self.bt_play.connect("clicked", self.xmms2_start)
+		self.bt_stop.connect("clicked", self.xmms2_stop)
+		self.bt_pause.connect("clicked", self.xmms2_pause)
+		
 		try:
 			self.xmms.playback_current_id(self.handler_playback_current_id)
 			self.xmms.playlist_list_entries('_active', self.get_tracks)				
@@ -374,19 +389,28 @@ class player:
 	def xmms2_clear(self):
 		self.xmms.playlist_clear()
 		
-	def xmms2_next(self):
+	def xmms2_next(self, widget=None):
 		self.xmms.playlist_set_next_rel(1)
 		self.xmms.playback_tickle()
 
-	def xmms2_prev(self):
+	def xmms2_prev(self, widget=None):
 		self.xmms.playlist_set_next_rel(-1)
 		self.xmms.playback_tickle()
 		
-	def xmms2_play(self, pos):		
+	def xmms2_play(self, pos):
 		self.xmms.playlist_set_next(pos)
 		self.xmms.playback_tickle()		
 		if self.status == 0:
 			self.xmms.playback_start()
+
+	def xmms2_start(self, widget=None):
+		self.xmms.playback_start()
+
+	def xmms2_stop(self, widget=None):
+		self.xmms.playback_stop()
+
+	def xmms2_pause(self, widget=None):
+		self.xmms.playback_pause()
 		
 	def get_filename(self, url):		
 		n = url.split('/')
