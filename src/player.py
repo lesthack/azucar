@@ -3,6 +3,7 @@
 
 import gobject
 import gtk
+import pango
 import re
 import os
 import keybinder
@@ -21,7 +22,7 @@ class player:
 		self.builder = gtk.Builder()
 		self.builder.add_from_file(UI_FILE)
 		self.window = self.builder.get_object("main")				
-		self.app_cover = cover()
+		#self.app_cover = cover()
 					
 		self.__properties__()
 		self.__set_signals__()
@@ -35,6 +36,20 @@ class player:
 		self.playerbar = self.builder.get_object("playerbar")				
 
 		self.panel_artists = self.builder.get_object("panel_artists")
+
+		self.album = self.builder.get_object("lb_album")
+		self.artist = self.builder.get_object("lb_artist")
+		self.song = self.builder.get_object("lb_song")		
+		self.image_cover = self.builder.get_object("cover_image")
+		self.timer = self.builder.get_object("lb_timer")
+
+		attr = pango.AttrList()
+		size = pango.AttrSize(20000, 0, -1)
+		weight = pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)
+		attr.insert(size)
+		attr.insert(weight)
+		
+		self.timer.set_attributes(attr)
 		
 		self.playerbar.set_fraction(0)
 		
@@ -47,8 +62,8 @@ class player:
 		self.current_song_duration = 0
 		self.status = None
 		
-		self.modelo = gtk.ListStore (int, str, 'gboolean')
-		self.list_active.set_model(self.modelo)
+		self.model_songs = gtk.ListStore (int, str, 'gboolean')
+		self.list_active.set_model(self.model_songs)
 		
 		render = gtk.CellRendererText() 
 		render.set_property('cell-background', '#eee')
@@ -61,8 +76,8 @@ class player:
 		self.list_active.connect("key-press-event", self.list_active_keypress)
 		self.list_active.connect("row-activated", self.list_active_row_activated)
 		self.window.connect("key-press-event", self.main_keypress)
-		self.window.connect("configure-event", self.main_configure)
-		self.window.connect("focus-out-event", self.main_focusout)
+		#self.window.connect("configure-event", self.main_configure)
+		#self.window.connect("focus-out-event", self.main_focusout)
 		self.window.connect("destroy", gtk.main_quit)
 		try:
 			self.xmms.playback_current_id(self.handler_playback_current_id)
@@ -86,15 +101,15 @@ class player:
 		elif update['type']==1:
 			self.xmms.medialib_get_info(update['id'], self.add_track)
 		elif update['type']==2: #shuffle
-			self.modelo.clear()
+			self.model_songs.clear()
 			self.xmms.playlist_list_entries('_active', self.get_tracks)
 		elif update['type']==3: #remove
 			self.remove_track(update['position'])
 		elif update['type']==4: #clear
-			self.modelo.clear()
-			self.list_active.set_model(self.modelo)
+			self.model_songs.clear()
+			self.list_active.set_model(self.model_songs)
 		elif update['type']==5: #change positions
-			self.modelo.swap(self.modelo[update['position']].iter, self.modelo[update['newposition']].iter)
+			self.model_songs.swap(self.model_songs[update['position']].iter, self.model_songs[update['newposition']].iter)
 
 	def handler_playback_current_id(self, result):						
 		self.xmms.medialib_get_info(result.value(), self.set_track_player)
@@ -103,7 +118,7 @@ class player:
 	def __select_row__(self, id):
 		try:
 			miter = self.get_iter(id)
-			if miter and self.modelo == self.list_active.get_model():
+			if miter and self.model_songs == self.list_active.get_model():
 				self.list_active.get_selection().select_iter(miter)
 		except:
 			self.logger.error('to get selection: __select_row__')
@@ -116,8 +131,8 @@ class player:
 		if len(str(min))==1: min = "0%s" % min
 		if len(str(sec))==1: sec = "0%s" % sec
 
-		self.playerbar.set_text("%s:%s  %s" % (min, sec, self.current_song))
-
+		self.timer.set_text("%s:%s" % (min, sec) )
+		
 		progress = 0.0
 		
 		if self.current_song_duration > 0:
@@ -131,11 +146,22 @@ class player:
 		track = self.get_taginfo(result.value())
 		if track:
 			self.current_song = "%s - %s" % (track[1],track[2])		
-			self.current_song_duration = result.value()['duration']				
+			self.current_song_duration = result.value()['duration']
+
+			self.artist.set_text("Artist: %s" % track[1])
+			self.song.set_text("%s" % track[2])
+			self.album.set_text("Album: %s" % track[3])
+
+			try:
+				url_cover = "%s/.config/xmms2/bindata/%s" % (os.getenv("HOME"), result.value()['picture_front'])
+			except:
+				url_cover = "data/no-cover.jpg"
+
+			self.set_cover_information(url_cover)
 			
 	def remove_track(self, position):
 		try:
-			self.modelo.remove(self.modelo[position].iter)
+			self.model_songs.remove(self.model_songs[position].iter)
 		except:
 			self.logger.error("Can't remove position: %s" % position)
 		
@@ -147,7 +173,7 @@ class player:
 	def add_track(self, result):
 		taginfo = self.get_taginfo(result.value())
 		try:
-			self.modelo.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])		
+			self.model_songs.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])		
 			self.cellbackground = (True, False)[self.cellbackground==True]
 		except:
 			self.logger.error("Can't to append: %s" % result.value())
@@ -191,10 +217,10 @@ class player:
 
 		cellbackground = True
 		
-		for i in self.modelo:						
-			match = re.search(r'%s' % widget.get_text().lower(), self.modelo.get_value(i.iter, 1).lower())
+		for i in self.model_songs:						
+			match = re.search(r'%s' % widget.get_text().lower(), self.model_songs.get_value(i.iter, 1).lower())
 			if match:
-				modeltemp.append([self.modelo.get_value(i.iter, 0), self.modelo.get_value(i.iter, 1), cellbackground])
+				modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), cellbackground])
 				cellbackground = (True, False)[cellbackground==True]
 
 		self.list_active.set_model(modeltemp)
@@ -204,17 +230,11 @@ class player:
 			sel = self.list_active.get_selection().get_selected()
 			id = widget.get_model().get_value(sel[1], 0)				
 
-			if event.keyval	in [65363]: # Show Cover			
-				try:								
-					self.xmms.medialib_get_info(id, self.set_cover_information)
-				except:
-					self.logger.error("in list_active_keypress")
-					
-			elif event.keyval == 65535: # Delete Item			
+			if event.keyval == 65535: # Delete Item			
 				try:								
 					pos = self.get_song_position(id)
 					self.xmms.playlist_remove_entry(pos,'_active')
-					self.list_active.set_model(self.modelo)
+					self.list_active.set_model(self.model_songs)
 				except:
 					self.logger.error("in remove item to playlist")					
 			else:
@@ -222,33 +242,30 @@ class player:
 		except:
 			return
 
-	def set_cover_information(self, result):
+	def set_cover_information(self, url_cover):			
 		try:
-			url_cover = "%s/.config/xmms2/bindata/%s" % (os.getenv("HOME"), result.value()['picture_front'])
+			pixbuf = gtk.gdk.pixbuf_new_from_file(url_cover)
+			scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
+			self.image_cover.set_from_pixbuf(scaled_buf)
 		except:
-			url_cover = "data/no-cover.jpg"
-
-		taginfo = self.get_taginfo(result.value())
-		self.app_cover.set_artist("Artist: %s" % taginfo[1])
-		self.app_cover.set_song("%s" % taginfo[2])
-		self.app_cover.set_album("Album: %s" % taginfo[3])
-		self.app_cover.set_url(url_cover)
-		self.app_cover.window.show()
-
+			pixbuf = gtk.gdk.pixbuf_new_from_file("data/no-cover.jpg")
+			scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
+			self.image_cover.set_from_pixbuf(scaled_buf)
+		
 	def list_active_row_activated(self, widget, iter, path):
 		modelo = widget.get_model()
 		new_pos = self.get_song_position(int(modelo.get_value(modelo[iter[0]].iter, 0)))		
 		self.xmms2_play(new_pos)
 		
-	def main_configure(self, widget, event):		
-		width, height = self.window.get_size()
-		x, y = self.window.get_position()
+	#def main_configure(self, widget, event):		
+	#	width, height = self.window.get_size()
+	#	x, y = self.window.get_position()
 		
-		self.window.get_position()
-		self.app_cover.window.move(x+width+7,y+60)
+	#	self.window.get_position()
+	#	self.app_cover.window.move(x+width+7,y+60)
 
-	def main_focusout(self, widget, event):
-		self.app_cover.window.hide()
+	#def main_focusout(self, widget, event):
+	#	self.app_cover.window.hide()
 
 	def main_keypress(self, widget, event):
 		keyval = event.keyval
@@ -267,10 +284,16 @@ class player:
 			self.xmms2_clear()
 		elif mod == "Ctrl+I":
 			self.xmms.playback_current_id(self.handler_playback_current_id)
-		elif mod == "Ctrl+J":
+		elif mod == "Ctrl+N":
 			self.trans_change_left()
-		elif mod == "Ctrl+K":
+		elif mod == "Ctrl+M":
 			self.trans_change_right()
+		elif mod == "Ctrl+J":
+			if self.insearch.get_visible():
+				self.insearch.set_visible(False)
+			else:
+				self.insearch.set_visible(True)
+				self.insearch.grab_focus()
 
 	def trans_change_left(self):		
 		self.panel_artists.set_visible(True)
@@ -394,14 +417,14 @@ class player:
 	def get_song_position(self, id):
 		pos = 0
 		if id > -1:
-			for i in self.modelo:
+			for i in self.model_songs:
 				if i[0] == id:
 					return pos
 				pos+=1
 		return 0
 
 	def get_iter(self, id):
-		for it in self.modelo:
+		for it in self.model_songs:
 			if it[0] == id:
 				return it.iter
 		return None
