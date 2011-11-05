@@ -208,7 +208,7 @@ class player:
 		
 	def initlogger(self):
 		self.logger = logging.getLogger('xmms2me')
-		hdlr = logging.FileHandler('xmms2me.log')
+		hdlr = logging.FileHandler('%s/.config/xmms2/azucar.log' % os.getenv("HOME"))
 		formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 		hdlr.setFormatter(formatter)
 		self.logger.addHandler(hdlr)
