@@ -8,7 +8,8 @@ import re
 import os
 import keybinder
 import logging
-#from cover import *
+import time
+import pynotify
 
 UI_FILE = "data/player.ui"
 
@@ -21,9 +22,10 @@ class player:
 		
 		self.builder = gtk.Builder()
 		self.builder.add_from_file(UI_FILE)
-		self.window = self.builder.get_object("main")				
-		#self.app_cover = cover()
-					
+		self.window = self.builder.get_object("main")		
+
+		pynotify.init('Azucar')
+		
 		self.__properties__()
 		self.__set_signals__()
 		self.__set_hotkeys__()
@@ -31,6 +33,7 @@ class player:
 	def __properties__(self):		
 		self.panel_active = self.builder.get_object("panel_active")
 		self.scrollplaylist = self.builder.get_object("scrollplaylist")
+		self.scrollalbums = self.builder.get_object("scrollalbums")
 		self.list_active = self.builder.get_object("list_active")
 		self.insearch = self.builder.get_object("insearch")
 		self.playerbar = self.builder.get_object("playerbar")				
@@ -44,7 +47,7 @@ class player:
 		self.timer = self.builder.get_object("lb_timer")
 
 		attr_timer = pango.AttrList()
-		attr_timer.insert(pango.AttrSize(20000, 0, -1)) #font size
+		attr_timer.insert(pango.AttrSize(24000, 0, -1)) #font size
 		attr_timer.insert(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)) #font weight		
 		self.timer.set_attributes(attr_timer)
 
@@ -72,6 +75,8 @@ class player:
 		self.current_song = ""
 		self.current_song_duration = 0
 		self.status = None
+
+		self.volume = 100
 		
 		self.model_songs = gtk.ListStore (int, str, 'gboolean')
 		self.list_active.set_model(self.model_songs)
@@ -86,9 +91,9 @@ class player:
 		self.insearch.connect("changed", self.search_song)
 		self.list_active.connect("key-press-event", self.list_active_keypress)
 		self.list_active.connect("row-activated", self.list_active_row_activated)
+		self.list_active.connect("drag_data_get", self.list_active_drag_data_get)
+		self.list_active.connect("drag_data_received", self.list_active_drag_data_received)
 		self.window.connect("key-press-event", self.main_keypress)
-		#self.window.connect("configure-event", self.main_configure)
-		#self.window.connect("focus-out-event", self.main_focusout)
 		self.window.connect("destroy", gtk.main_quit)
 		self.bt_next.connect("clicked", self.xmms2_next)
 		self.bt_prev.connect("clicked", self.xmms2_prev)
@@ -104,6 +109,7 @@ class player:
 			self.xmms.broadcast_playlist_changed(self.handler_playlist_change)
 			self.xmms.broadcast_playback_current_id(self.handler_playback_current_id)
 			self.xmms.broadcast_playback_status(self.handler_playback_status)
+			self.xmms.playback_volume_get(self.xmms2_volume)
 		except:
 			self.logger.critical("Error in hanlder's to xmms2")
 
@@ -168,13 +174,18 @@ class player:
 			self.artist.set_text("Artist: %s" % track[1])
 			self.song.set_text("%s" % track[2])
 			self.album.set_text("Album: %s" % track[3])
-
+			
 			try:
 				url_cover = "%s/.config/xmms2/bindata/%s" % (os.getenv("HOME"), result.value()['picture_front'])
 			except:
 				url_cover = "data/no-cover.jpg"
 
 			self.set_cover_information(url_cover)
+
+			notify = pynotify.Notification(track[2], "Album: %s \nArtis: %s" % (track[3], track[1]) )
+			notify.set_icon_from_pixbuf(self.image_cover.get_pixbuf())
+			notify.set_timeout(1000)
+			notify.show()
 			
 	def remove_track(self, position):
 		try:
@@ -190,7 +201,7 @@ class player:
 	def add_track(self, result):
 		taginfo = self.get_taginfo(result.value())
 		try:
-			self.model_songs.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])		
+			self.model_songs.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[0]), self.cellbackground])		
 			self.cellbackground = (True, False)[self.cellbackground==True]
 		except:
 			self.logger.error("Can't to append: %s" % result.value())
@@ -273,17 +284,35 @@ class player:
 		modelo = widget.get_model()
 		new_pos = self.get_song_position(int(modelo.get_value(modelo[iter[0]].iter, 0)))		
 		self.xmms2_play(new_pos)
-		
-	#def main_configure(self, widget, event):		
-	#	width, height = self.window.get_size()
-	#	x, y = self.window.get_position()
-		
-	#	self.window.get_position()
-	#	self.app_cover.window.move(x+width+7,y+60)
 
-	#def main_focusout(self, widget, event):
-	#	self.app_cover.window.hide()
+	def list_active_drag_data_get(self, treeview, context, selection, target_id, etime):
+		treeselection = treeview.get_selection()
+		model, iter = treeselection.get_selected()
+		data = model.get_value(iter, 0)		
+		#print data, target_id
 
+	def list_active_drag_data_received(self, treeview, context, x, y, selection, info, etime):
+		treeselection = treeview.get_selection()
+		model_sel, iter_sel = treeselection.get_selected()
+		data_sel = model_sel.get_value(iter_sel, 0)		
+		
+		model = treeview.get_model()
+		data = selection.data
+		drop_info = treeview.get_dest_row_at_pos(x, y)
+
+		print info
+		
+		if drop_info:
+			path, position = drop_info
+			iter = model.get_iter(path)
+			data = model.get_value(iter, 0)
+			if (position == gtk.TREE_VIEW_DROP_BEFORE or position == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
+				print "Mover %s Antes de %s" % (data_sel, data)
+			else:
+				print "Mover %s Despues de %s" % (data_sel, data)
+
+		return 
+	
 	def main_keypress(self, widget, event):
 		keyval = event.keyval
 		name = gtk.gdk.keyval_name(keyval)
@@ -301,25 +330,39 @@ class player:
 			self.xmms2_clear()
 		elif mod == "Ctrl+I":
 			self.xmms.playback_current_id(self.handler_playback_current_id)
-		elif mod == "Ctrl+N":
-			self.trans_change_left()
-		elif mod == "Ctrl+M":
-			self.trans_change_right()
 		elif mod == "Ctrl+J":
-			if self.insearch.get_visible():
-				self.insearch.set_visible(False)
-			else:
-				self.insearch.set_visible(True)
+			if not self.insearch.get_visible():
+				self.insearch.set_visible(True)				
 				self.insearch.grab_focus()
+			else:
+				self.insearch.set_visible(False)
+		elif mod == "Ctrl++":
+			self.volume_up()
+		elif mod == "Ctrl+-":			
+			self.volume_down()
 
-	def trans_change_left(self):		
-		self.panel_artists.set_visible(True)
-		self.panel_active.set_visible(False)
+	def volume_up(self):
+		self.volume = (self.volume+10, 100)[self.volume+10>100]
+		self.xmms.playback_volume_set('master', self.volume)
 
-	def trans_change_right(self):
-		self.panel_artists.set_visible(False)
-		self.panel_active.set_visible(True)
-	
+		notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
+		notify.set_timeout(500)
+		notify.show()
+		
+	def volume_down(self):
+		self.volume = (self.volume-10, 0)[self.volume-10<=0]
+		self.xmms.playback_volume_set('master', self.volume)			
+
+		notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
+		notify.set_timeout(500)
+		notify.show()
+		
+	def xmms2_volume(self, result):
+		try:
+			self.volume = result.value()['master']
+		except:
+			self.logger.info("No volume master access")
+			
 	def xmms2_open_files(self):
 		
 		dialog = gtk.FileChooserDialog("Add Music Files..",
@@ -454,3 +497,4 @@ class player:
 			if it[0] == id:
 				return it.iter
 		return None
+	
