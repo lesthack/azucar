@@ -128,7 +128,7 @@ class player:
         self.status = result.value()
     
     def handler_playlist_change(self, result):        
-        update = result.value()
+        update = result.value()        
         
         if update['type']==0: #add            
             self.xmms.medialib_get_info(update['id'], self.add_track)
@@ -143,8 +143,11 @@ class player:
         elif update['type']==4: #clear
             self.model_songs.clear()
             self.list_active.set_model(self.model_songs)
-        elif update['type']==5: #change positions            
-            self.model_songs.swap(self.model_songs[update['position']].iter, self.model_songs[update['newposition']].iter)
+        elif update['type']==5: #change positions                        
+            if(update['newposition']<update['position']):
+                self.model_songs.move_before(self.model_songs[update['position']].iter, self.model_songs[update['newposition']].iter)
+            elif(update['newposition']>update['position']):
+                self.model_songs.move_after(self.model_songs[update['position']].iter, self.model_songs[update['newposition']].iter)
 
     def handler_playback_current_id(self, result):                        
         self.xmms.medialib_get_info(result.value(), self.set_track_player)
@@ -224,9 +227,13 @@ class player:
             return        
         else:
             taginfo = self.get_taginfo(result.value())
-                        
-            iter = self.model_songs.get_iter(self.pos_move)            
-            self.model_songs.insert_before(iter, [taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])            
+            
+            try:
+                iter = self.model_songs.get_iter(self.pos_move)
+                self.model_songs.insert_before(iter, [taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])
+            except:
+                iter = self.model_songs.get_iter(self.pos_move-1)
+                self.model_songs.insert_after(iter, [taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])
             
             cellbackground = True
             modeltemp = gtk.ListStore (int, str, 'gboolean')
@@ -338,7 +345,7 @@ class player:
             pos_des = path[0]
             id_sel = model.get_value(iter_sel, 0)
             pos_sel = model.get_path(iter_sel)[0]
-                        
+            
             self.xmms.playlist_remove_entry(pos_sel,'_active')
             self.xmms.playlist_insert_id(path[0], id_sel)            
         
@@ -528,4 +535,3 @@ class player:
             if it[0] == id:
                 return it.iter
         return None
-    
