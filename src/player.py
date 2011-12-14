@@ -87,15 +87,17 @@ class player:
         self.volume = 100
         self.pos_move = -1
         
-        self.model_songs = gtk.ListStore (int, str, 'gboolean')
+        self.model_songs = gtk.ListStore (int, str, str, 'gboolean')
         self.list_active.set_model(self.model_songs)
         self.list_active.enable_model_drag_source( gtk.gdk.BUTTON1_MASK, self.TARGETS, gtk.gdk.ACTION_DEFAULT|gtk.gdk.ACTION_MOVE)
         self.list_active.enable_model_drag_dest(self.TARGETS, gtk.gdk.ACTION_DEFAULT)
         
         render = gtk.CellRendererText() 
-        render.set_property('cell-background', '#eee')
-        columna = gtk.TreeViewColumn ("name", render, text=1, cell_background_set=2)
-        self.list_active.append_column(columna)
+        render.set_property('cell-background', '#eee')        
+        columna_one = gtk.TreeViewColumn ("Artist", render, text=1, cell_background_set=3)        
+        columna_two = gtk.TreeViewColumn ("Song", render, text=2, cell_background_set=3)
+        self.list_active.append_column(columna_one)
+        self.list_active.append_column(columna_two)
         self.cellbackground = True
 
     def __set_signals__(self):
@@ -219,7 +221,7 @@ class player:
     def add_track(self, result):
         taginfo = self.get_taginfo(result.value())
         try:
-            self.model_songs.append([taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])        
+            self.model_songs.append([taginfo[0], taginfo[1], taginfo[2], self.cellbackground])        
             self.cellbackground = (True, False)[self.cellbackground==True]
         except:
             self.logger.error("Can't to append: %s" % result.value())    
@@ -233,16 +235,16 @@ class player:
             
             try:
                 iter = self.model_songs.get_iter(self.pos_move)
-                self.model_songs.insert_before(iter, [taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])
+                self.model_songs.insert_before(iter, [taginfo[0], taginfo[1], taginfo[2], self.cellbackground])
             except:
                 iter = self.model_songs.get_iter(self.pos_move-1)
-                self.model_songs.insert_after(iter, [taginfo[0], "%s - %s" % (taginfo[1], taginfo[2]), self.cellbackground])
+                self.model_songs.insert_after(iter, [taginfo[0], taginfo[1], taginfo[2], self.cellbackground])
             
             cellbackground = True
-            modeltemp = gtk.ListStore (int, str, 'gboolean')
+            modeltemp = gtk.ListStore (int, str, str, 'gboolean')
             
             for i in self.model_songs:                                        
-                modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), cellbackground])
+                modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), self.model_songs.get_value(i.iter, 2), cellbackground])
                 cellbackground = (True, False)[cellbackground==True]
     
             self.model_songs = modeltemp            
@@ -286,14 +288,17 @@ class player:
         self.logger.setLevel(logging.INFO)
 
     def search_song(self, widget):
-        modeltemp = gtk.ListStore (int, str, 'gboolean')
-
-        cellbackground = True
-        
+        if len(widget.get_text())==0:
+            self.list_active.set_reorderable(True)
+        else:
+            self.list_active.set_reorderable(False)
+            
+        modeltemp = gtk.ListStore (int, str, str, 'gboolean')
+        cellbackground = True        
         for i in self.model_songs:                        
-            match = re.search(r'%s' % widget.get_text().lower(), self.model_songs.get_value(i.iter, 1).lower())
+            match = re.search(r'%s' % widget.get_text().lower(), "%s %s" % (self.model_songs.get_value(i.iter, 1).lower(),self.model_songs.get_value(i.iter, 2).lower()))
             if match:
-                modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), cellbackground])
+                modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), self.model_songs.get_value(i.iter, 2), cellbackground])
                 cellbackground = (True, False)[cellbackground==True]
 
         self.list_active.set_model(modeltemp)
