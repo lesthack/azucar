@@ -123,7 +123,10 @@ class player:
             self.xmms.playback_volume_get(self.xmms2_volume)
         except:
             self.logger.critical("Error in hanlder's to xmms2")
-
+    
+    def exit(self):
+        gtk.main_quit()
+    
     def handler_playback_status(self, result):
         self.status = result.value()
     
@@ -376,8 +379,10 @@ class player:
                 self.insearch.set_visible(False)
         elif mod == "Ctrl++":
             self.volume_up()
-        elif mod == "Ctrl+-":            
+        elif mod == "Ctrl+-":
             self.volume_down()
+        elif mod == "Ctrl+Q":
+            self.exit()
 
     def volume_up(self):
         self.volume = (self.volume+10, 100)[self.volume+10>100]
