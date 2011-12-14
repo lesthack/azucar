@@ -81,11 +81,12 @@ class player:
                     'mpc', 'mp+', 'mpp', 'oga', 'sid')
             
         self.current_song = ""
+        self.current_song_id = None
         self.current_song_duration = 0
         self.status = None
 
         self.volume = 100
-        self.pos_move = -1
+        self.pos_move = -1        
         
         self.model_songs = gtk.ListStore (int, str, str, 'gboolean')
         self.list_active.set_model(self.model_songs)
@@ -154,7 +155,8 @@ class player:
             elif(update['newposition']>update['position']):
                 self.model_songs.move_after(self.model_songs[update['position']].iter, self.model_songs[update['newposition']].iter)
 
-    def handler_playback_current_id(self, result):                        
+    def handler_playback_current_id(self, result):
+        self.current_song_id = result.value()
         self.xmms.medialib_get_info(result.value(), self.set_track_player)
         self.__select_row__(result.value())
 
@@ -355,7 +357,7 @@ class player:
             pos_sel = model.get_path(iter_sel)[0]
             
             self.xmms.playlist_remove_entry(pos_sel,'_active')
-            self.xmms.playlist_insert_id(path[0], id_sel)            
+            self.xmms.playlist_insert_id(path[0], id_sel)
         
         return        
     
@@ -381,7 +383,12 @@ class player:
                 self.insearch.set_visible(True)                
                 self.insearch.grab_focus()
             else:
-                self.insearch.set_visible(False)
+                if len(self.insearch.get_text()) == 0:
+                    self.insearch.set_visible(False)
+                else:
+                    self.insearch.grab_focus()
+        elif mod == "Ctrl+A":
+            self.jump_item()
         elif mod == "Ctrl++":
             self.volume_up()
         elif mod == "Ctrl+-":
@@ -403,8 +410,8 @@ class player:
 
         notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
         notify.set_timeout(500)
-        notify.show()
-        
+        notify.show()    
+    
     def xmms2_volume(self, result):
         try:
             self.volume = result.value()['master']
@@ -545,3 +552,12 @@ class player:
             if it[0] == id:
                 return it.iter
         return None
+        
+    def jump_item(self):        
+        treeselection = self.list_active.get_selection()
+        model, iter = treeselection.get_selected()
+                
+        pos = self.model_songs.get_path(iter)[0]
+        current_pos = self.get_song_position(self.current_song_id)
+        
+        self.xmms.playlist_move(pos, current_pos)        
