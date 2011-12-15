@@ -24,10 +24,10 @@ You can try now:
   
 * Debian/Ubuntu
     
-  $ git clone git://github.com/lesthack/azucar.git
-  $ sudo apt-get install python-gtk2 python-keybinder python-notify xmms2 python-xmmsclient
-  $ cd azucar
-  $ python azucar.py
+    $ git clone git://github.com/lesthack/azucar.git
+    $ sudo apt-get install python-gtk2 python-keybinder python-notify xmms2 python-xmmsclient
+    $ cd azucar
+    $ python azucar.py
 
 * Global Keys
 
