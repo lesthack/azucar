@@ -10,15 +10,15 @@ So, XMMS2 is definitely an audio player. But it is not a general multimedia play
 Azucar is a xmms2 frontend worked in python.
 
 Librarys:
-  xmmsclient
-  xmmsclient.glib
+* xmmsclient
+* xmmsclient.glib
   
-  gtk
-  gobject
-  pango
-  keybinder
-  logging
-  pynotify
+* gtk
+* gobject
+* pango
+* keybinder
+* logging
+* pynotify
 
 You can try now:
  
