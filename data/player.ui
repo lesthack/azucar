@@ -3,19 +3,19 @@
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="main">
-    <property name="width_request">500</property>
+    <property name="width_request">550</property>
     <property name="title" translatable="yes">Azucar</property>
     <property name="window_position">center</property>
     <property name="default_width">500</property>
     <property name="opacity">0.90000000000000002</property>
     <child>
       <object class="GtkVBox" id="vbox_content">
-        <property name="width_request">500</property>
+        <property name="width_request">550</property>
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkHBox" id="hbox_cover">
-            <property name="width_request">500</property>
+            <property name="width_request">550</property>
             <property name="height_request">100</property>
             <property name="visible">True</property>
             <child>
@@ -34,90 +34,63 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="hbox_details">
+              <object class="GtkLayout" id="layout_information">
                 <property name="visible">True</property>
+                <child>
+                  <object class="GtkLabel" id="lb_song">
+                    <property name="width_request">335</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="label" translatable="yes">Song</property>
+                    <attributes>
+                      <attribute name="weight" value="bold"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="x">10</property>
+                    <property name="y">19</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="lb_artist">
+                    <property name="width_request">335</property>
+                    <property name="height_request">15</property>
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="label" translatable="yes">Artist</property>
+                    <attributes>
+                      <attribute name="foreground" value="#000000000000"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="x">10</property>
+                    <property name="y">45</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="lb_album">
+                    <property name="width_request">335</property>
+                    <property name="height_request">15</property>
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="label" translatable="yes">Album</property>
+                  </object>
+                  <packing>
+                    <property name="x">10</property>
+                    <property name="y">58</property>
+                  </packing>
+                </child>
                 <child>
                   <object class="GtkLabel" id="lb_timer">
                     <property name="width_request">100</property>
-                    <property name="height_request">100</property>
+                    <property name="height_request">80</property>
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">00:00</property>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkVBox" id="vbox_information">
-                    <property name="width_request">300</property>
-                    <property name="height_request">100</property>
-                    <property name="visible">True</property>
-                    <property name="orientation">vertical</property>
-                    <child>
-                      <object class="GtkFixed" id="fixed1">
-                        <property name="visible">True</property>
-                      </object>
-                      <packing>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="lb_song">
-                        <property name="visible">True</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Song</property>
-                        <attributes>
-                          <attribute name="weight" value="bold"/>
-                        </attributes>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="lb_artist">
-                        <property name="visible">True</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Artist</property>
-                        <attributes>
-                          <attribute name="foreground" value="#000000000000"/>
-                        </attributes>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="lb_album">
-                        <property name="visible">True</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Album</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="position">3</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkFixed" id="fixed2">
-                        <property name="visible">True</property>
-                      </object>
-                      <packing>
-                        <property name="position">4</property>
-                      </packing>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">1</property>
+                    <property name="x">340</property>
+                    <property name="y">10</property>
                   </packing>
                 </child>
               </object>

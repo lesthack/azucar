@@ -44,10 +44,14 @@ class player:
         self.scrollalbums = self.builder.get_object("scrollalbums")
         self.list_active = self.builder.get_object("list_active")
         self.insearch = self.builder.get_object("insearch")
-        self.playerbar = self.builder.get_object("playerbar")                
-
+        self.playerbar = self.builder.get_object("playerbar")
+        self.layout_information = self.builder.get_object("layout_information")
+        
         self.panel_artists = self.builder.get_object("panel_artists")
-
+        
+        self.playerbar.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(9000, 9000, 9000))
+        self.layout_information.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(0, 0, 0)) 
+        
         self.album = self.builder.get_object("lb_album")
         self.artist = self.builder.get_object("lb_artist")
         self.song = self.builder.get_object("lb_song")        
@@ -56,14 +60,22 @@ class player:
 
         attr_timer = pango.AttrList()
         attr_timer.insert(pango.AttrSize(24000, 0, -1)) #font size
-        attr_timer.insert(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)) #font weight        
+        attr_timer.insert(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)) #font weight
+        attr_timer.insert(pango.AttrForeground(65535, 65535, 65535, 0, -1)) #font color
         self.timer.set_attributes(attr_timer)
-
+        
         attr_song = pango.AttrList()
         attr_song.insert(pango.AttrSize(14000, 0, -1)) #font size
-        attr_song.insert(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)) #font weight        
+        attr_song.insert(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)) #font weight
+        attr_song.insert(pango.AttrForeground(65535, 65535, 65535, 0, -1))
         self.song.set_attributes(attr_song)
-
+        
+        attr_others = pango.AttrList()
+        attr_others.insert(pango.AttrForeground(60000, 60000, 60000, 0, -1))
+        attr_others.insert(pango.AttrSize(10000, 0, -1)) #font size
+        self.album.set_attributes(attr_others)
+        self.artist.set_attributes(attr_others)
+        
         # buttons
         self.bt_next = self.builder.get_object("bt_next")
         self.bt_prev = self.builder.get_object("bt_prev")
@@ -193,9 +205,9 @@ class player:
             self.current_song = "%s - %s" % (track[1],track[2])        
             self.current_song_duration = result.value()['duration']
 
-            self.artist.set_text("Artist: %s" % track[1])
+            self.artist.set_text("%s" % track[1])
             self.song.set_text("%s" % track[2])
-            self.album.set_text("Album: %s" % track[3])
+            self.album.set_text("%s" % track[3])
             
             try:
                 url_cover = "%s/.config/xmms2/bindata/%s" % (os.getenv("HOME"), result.value()['picture_front'])
