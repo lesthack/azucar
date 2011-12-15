@@ -29,20 +29,20 @@ You can try now (Debian/Ubuntu):
 
 * Global Keys
 
-    Ctrl + C: Play 
-    Ctrl + B: Stop
-    Ctrl + X: Pause (Toggle)
-    Ctrl + V: Next
-    Ctrl + Z: Previous
+    * Ctrl + C: Play 
+    * Ctrl + B: Stop
+    * Ctrl + X: Pause (Toggle)
+    * Ctrl + V: Next
+    * Ctrl + Z: Previous
     
 * Local Keys
 
-    Ctrl + O: Add Files
-    Ctrl + P: Add Directory (Recursivity)
-    Ctrl + L: Clear List
-    Ctrl + I: Current Item
-    Ctrl + +: Up Volume (+10)
-    Ctrl + -: Down Volume (-10)
-    Ctrl + J: Search Items 
-    Ctrl + Q: Quit Aplication
+    * Ctrl + O: Add Files
+    * Ctrl + P: Add Directory (Recursivity)
+    * Ctrl + L: Clear List
+    * Ctrl + I: Current Item
+    * Ctrl + +: Up Volume (+10)
+    * Ctrl + -: Down Volume (-10)
+    * Ctrl + J: Search Items 
+    * Ctrl + Q: Quit Aplication
     
