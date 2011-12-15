@@ -1,7 +1,7 @@
 # Azucar
 ### A xmms2 Frontend
 
-[![Azucar](http://lesthack.com.mx/wp-content/uploads/2011/12/azucar-xmms2-2.png)](http://lesthack.com.mx/wp-content/uploads/2011/12/azucar-xmms2-2.png)
+[![Azucar](http://lesthack.com.mx/wp-content/uploads/2011/12/azucar-xmms2-e1323929521882.png)](http://lesthack.com.mx/wp-content/uploads/2011/12/azucar-xmms2-e1323929521882.png)
 
 You might have heard of XMMS (legacy.xmms2.org), the hugely popular Winamp clone for Linux and UNIX-like operating systems. XMMS2 is a project started (in late 2002) by one of XMMS's original authors - Peter Alm - to produce a "kick-ass music player" (much like the world's 347349739921 other music player projects). In short, XMMS2 is the next generation XMMS.
 
