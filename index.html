@@ -3,12 +3,12 @@
 <head>
   <meta charset='utf-8'>
 
-  <title>lesthack/azucar @ GitHub</title>
-
+  <title>Azucar Xmms2 Frontend @ GitHub</title>
+  
   <style type="text/css">
     body {
       margin-top: 1.0em;
-      background-color: #FFF;
+      background-color: #EFEFEF;
       font-family: Helvetica, Arial, FreeSans, san-serif;
       color: #000;
     }
@@ -16,18 +16,48 @@
       margin: 0 auto;
       width: 700px;
     }
-    h1 { font-size: 3.8em; color: #ce9278; margin-bottom: 3px; }
+    h1 { font-size: 3.8em; color: #4682B4; margin-bottom: 3px; }
     h1 .small { font-size: 0.4em; }
     h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #ce9278; }
-    h3 { text-align: center; color: #ce9278; }
-    a { color: #ce9278; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+    h2 { font-size: 1.5em; color: #4682B4; }
+    h3 { text-align: center; color: #4682B4; }
+    a { color: #4682B4; }
+    
+    .description { 
+      	font-size: 1.2em; margin-bottom: 30px; margin-top: 30px;
+    }
     .download { float: right; }
+    p {
+    		text-align: justify;
+    }
+    p.ident{
+    		margin-left: 15px;
+    }
     pre { background: #000; color: #fff; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
+    .image{ 
+    		float: left;
+    		width: 320px;
+    }
+    .info{
+    		float: left;
+    		width: 380px;
+    }
   </style>
+  <script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-27763266-1']);
+	  _gaq.push(['_trackPageview']);
+	
+	  (function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+
+  </script>
 </head>
 
 <body>
@@ -48,51 +78,61 @@
     <div class="description">
       Azucar is a Xmms2 Frontend
     </div>
-
-    
+    <div class="image">
+    		<img src="http://lesthack.com.mx/wp-content/uploads/2011/12/azucar-xmms2-e1323929521882.png" width="300px" />
+    </div>
+    <div class="info">
       <p>You might have heard of XMMS (legacy.xmms2.org), the hugely popular Winamp clone for Linux and UNIX-like operating systems. XMMS2 is a project started (in late 2002) by one of XMMS's original authors - Peter Alm - to produce a "kick-ass music player" (much like the world's 347349739921 other music player projects). In short, XMMS2 is the next generation XMMS.<p>
-
       <p>So, XMMS2 is definitely an audio player. But it is not a general multimedia player - it will not play videos. It has a modular framework and plugin architecture for audio processing, visualisation and output, but this framework has not been designed to support video. Also the client-server design of XMMS2 (and the daemon being independent of any graphics output) practically prevents direct video output being implemented.</p>
-
-      <p>Azucar is a xmms2 frontend worked in python.</p>
-    
-
+      
+    </div>
+    <div style="clear: both; padding-top: 15px;">
+    		<p>Azucar is a xmms2 frontend worked in python.</p>
+    </div>
     
       <h2>Dependencies</h2>
-      <p>xmmsclient, xmmsclient.glib, gtk, gobject, pango, keybinder, logging, pynotify</p>
+      <ul>
+      	<li>xmmsclient</li> 
+      	<li>xmmsclient.glib</li> 
+      	<li>gtk</li>
+      	<li>gobject</li> 
+      	<li>pango</li>
+      	<li>keybinder</li> 
+      	<li>logging</li>
+      	<li>pynotify</li>
+      </ul>
     
 
     
-      <h2>Install</h2>
-      <p>$ git clone git://github.com/lesthack/azucar.git
+      <h2>Install (Debian/Ubuntu)</h2>
+<pre>$ git clone git://github.com/lesthack/azucar.git
 $ sudo apt-get install python-gtk2 python-keybinder python-notify xmms2 python-xmmsclient
 $ cd azucar
-$ python azucar.py</p>
+$ python azucar.py
+</pre>
     
 
     
       <h2>License</h2>
-      <p>GNU GPL v 3.0</p>
+      <p class="ident"><a href="http://gplv3.fsf.org/">GNU GPL v 3.0</a></p>
     
 
     
       <h2>Authors</h2>
-      <p>Jorge Luis Hernández C. (lesthack@gmail.com)
-<br/>      </p>
-    
+      <p class="ident"><a href="http://lesthack.com.mx">Jorge Luis Hernández</a></p>
 
-    
       <h2>Contact</h2>
-      <p>Jorge Luis Hernández C. (lesthack@gmail.com)
-<br/>      </p>
+      <p class="ident">Mail: <a href="mailto:lesthack@gmail.com">lesthack.com.mx</a></p>
+      <p class="ident">Twitter: <a href="http://www.twitter.com/lesthack">@lesthack</a></p>
     
 
     <h2>Download</h2>
-    <p>
+    <p class="ident">
       You can download this project in either
       <a href="https://github.com/lesthack/azucar/zipball/master">zip</a> or
       <a href="https://github.com/lesthack/azucar/tarball/master">tar formats.
     </p>
+    <hr/>
     <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
       by running:
       <pre>$ git clone git://github.com/lesthack/azucar</pre>
