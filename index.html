@@ -24,7 +24,7 @@
     a { color: #4682B4; }
     
     .description { 
-      	font-size: 1.2em; margin-bottom: 30px; margin-top: 30px;
+    		font-size: 1.2em; margin-bottom: 30px; margin-top: 30px;
     }
     .download { float: right; }
     p {
@@ -43,6 +43,14 @@
     .info{
     		float: left;
     		width: 380px;
+    }
+    ul{
+    		list-style-type: none;
+    		list-style-image: none;
+    }
+    ul li{
+    		font-family: Courier;
+    		font-size: 14px;
     }
   </style>
   <script type="text/javascript">
@@ -90,50 +98,65 @@
     		<p>Azucar is a xmms2 frontend worked in python.</p>
     </div>
     
-      <h2>Dependencies</h2>
-      <ul>
-      	<li>xmmsclient</li> 
-      	<li>xmmsclient.glib</li> 
-      	<li>gtk</li>
-      	<li>gobject</li> 
-      	<li>pango</li>
-      	<li>keybinder</li> 
-      	<li>logging</li>
-      	<li>pynotify</li>
-      </ul>
+	<h2>Dependencies</h2>
+	<ul>
+		<li>xmmsclient</li> 
+		<li>xmmsclient.glib</li> 
+		<li>gtk</li>
+		<li>gobject</li> 
+		<li>pango</li>
+		<li>keybinder</li> 
+		<li>logging</li>
+		<li>pynotify</li>
+	</ul>
     
-
-    
-      <h2>Install (Debian/Ubuntu)</h2>
+	<h2>Install (Debian/Ubuntu)</h2>
 <pre>$ git clone git://github.com/lesthack/azucar.git
 $ sudo apt-get install python-gtk2 python-keybinder python-notify xmms2 python-xmmsclient
 $ cd azucar
 $ python azucar.py
 </pre>
+	<h2>Global Keys</h2>
+	<ul>
+		<li>Ctrl + C: Play</li> 
+		<li>Ctrl + B: Stop</li>
+		<li>Ctrl + X: Pause (Toggle)</li>
+		<li>Ctrl + V: Next</li>
+		<li>Ctrl + Z: Previous</li>
+	</ul>
     
+	<h2>Local Keys</h2>
+	<ul>
+		<li>Ctrl + O: Add Files</li> 
+		<li>Ctrl + P: Add Directory (Recursivity)</li>
+		<li>Ctrl + L: Clear List</li>
+		<li>Ctrl + I: Current Item</li>
+		<li>Ctrl + +: Up Volume (+10)</li>
+		<li>Ctrl + -: Down Volume (-10)</li>
+		<li>Ctrl + J: Search Items</li>
+		<li>Ctrl + Q: Quit Aplication</li>
+	</ul>
 
+	<h2>License</h2>
+	<p class="ident"><a href="http://gplv3.fsf.org/">GNU GPL v 3.0</a></p>
+			
+	<h2>Authors</h2>
+	<p class="ident"><a href="http://lesthack.com.mx">Jorge Luis Hernández</a></p>
+	
+	<h2>Contact</h2>
+	<p class="ident">Mail: <a href="mailto:lesthack@gmail.com">lesthack.com.mx</a></p>
+	<p class="ident">Twitter: <a href="http://www.twitter.com/lesthack">@lesthack</a></p>
+		
+	<h2>Download</h2>	
+	<p class="ident">
+	You can download this project in either
+	<a href="https://github.com/lesthack/azucar/zipball/master">zip</a> or
+	<a href="https://github.com/lesthack/azucar/tarball/master">tar formats.
+	</p>
     
-      <h2>License</h2>
-      <p class="ident"><a href="http://gplv3.fsf.org/">GNU GPL v 3.0</a></p>
+	<hr/>
     
-
-    
-      <h2>Authors</h2>
-      <p class="ident"><a href="http://lesthack.com.mx">Jorge Luis Hernández</a></p>
-
-      <h2>Contact</h2>
-      <p class="ident">Mail: <a href="mailto:lesthack@gmail.com">lesthack.com.mx</a></p>
-      <p class="ident">Twitter: <a href="http://www.twitter.com/lesthack">@lesthack</a></p>
-    
-
-    <h2>Download</h2>
-    <p class="ident">
-      You can download this project in either
-      <a href="https://github.com/lesthack/azucar/zipball/master">zip</a> or
-      <a href="https://github.com/lesthack/azucar/tarball/master">tar formats.
-    </p>
-    <hr/>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
+	<p>You can also clone the project with <a href="http://git-scm.com">Git</a>
       by running:
       <pre>$ git clone git://github.com/lesthack/azucar</pre>
     </p>
