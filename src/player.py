@@ -107,8 +107,9 @@ class player:
         
         render = gtk.CellRendererText() 
         render.set_property('cell-background', '#eee')        
-        columna_one = gtk.TreeViewColumn ("Artist", render, text=1, cell_background_set=3)        
-        columna_two = gtk.TreeViewColumn ("Song", render, text=2, cell_background_set=3)
+        columna_one = gtk.TreeViewColumn ("Artist", render, text=1, cell_background_set=3)
+        columna_one.set_resizable(True)
+        columna_two = gtk.TreeViewColumn ("Song", render, text=2, cell_background_set=3)        
         self.list_active.append_column(columna_one)
         self.list_active.append_column(columna_two)
         self.cellbackground = True

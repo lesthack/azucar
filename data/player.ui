@@ -7,6 +7,7 @@
     <property name="title" translatable="yes">Azucar</property>
     <property name="window_position">center</property>
     <property name="default_width">500</property>
+    <property name="icon">icons/azucar.ico</property>
     <property name="opacity">0.90000000000000002</property>
     <child>
       <object class="GtkVBox" id="vbox_content">
@@ -89,7 +90,7 @@
                     <property name="label" translatable="yes">00:00</property>
                   </object>
                   <packing>
-                    <property name="x">340</property>
+                    <property name="x">345</property>
                     <property name="y">10</property>
                   </packing>
                 </child>
@@ -123,7 +124,6 @@
         </child>
         <child>
           <object class="GtkVBox" id="panel_active">
-            <property name="height_request">500</property>
             <property name="visible">True</property>
             <property name="orientation">vertical</property>
             <child>
@@ -144,6 +144,7 @@
                 <property name="vscrollbar_policy">automatic</property>
                 <child>
                   <object class="GtkTreeView" id="list_active">
+                    <property name="height_request">500</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="headers_clickable">False</property>
@@ -164,6 +165,7 @@
         </child>
         <child>
           <object class="GtkHBox" id="hbox_buttons">
+            <property name="height_request">24</property>
             <property name="visible">True</property>
             <child>
               <object class="GtkButton" id="bt_prev">
@@ -272,7 +274,6 @@
               <object class="GtkButton" id="bt_albums">
                 <property name="width_request">24</property>
                 <property name="height_request">24</property>
-                <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="image">img_albums</property>
@@ -292,7 +293,6 @@
               <object class="GtkButton" id="bt_options">
                 <property name="width_request">24</property>
                 <property name="height_request">24</property>
-                <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="image">img_options</property>
@@ -310,6 +310,8 @@
             </child>
           </object>
           <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
             <property name="position">3</property>
           </packing>
         </child>
