@@ -10,17 +10,11 @@ import keybinder
 import logging
 import time
 import pynotify
+import ConfigParser
 
 UI_FILE = "data/player.ui"
 
 class player:
-    
-    TARGETS = [
-        ('MY_TREE_MODEL_ROW', gtk.TARGET_SAME_WIDGET, 0),
-        ('text/plain', 0, 1),
-        ('TEXT', 0, 2),
-        ('STRING', 0, 3),
-        ]
     
     def __init__(self, xmms):
         self.initlogger()
@@ -34,6 +28,7 @@ class player:
 
         pynotify.init('Azucar')
         
+        self.__get_config()
         self.__properties__()
         self.__set_signals__()
         self.__set_hotkeys__()
@@ -87,6 +82,13 @@ class player:
         
         self.playerbar.set_fraction(0)
         
+        self.TARGETS = [
+            ('MY_TREE_MODEL_ROW', gtk.TARGET_SAME_WIDGET, 0),
+            ('text/plain', 0, 1),
+            ('TEXT', 0, 2),
+            ('STRING', 0, 3),
+        ]
+        
         self.supported = ( 'mp1', 'mp2', 'mp3', 'm4a', 'm4p', 'ogg', 'flac', 'asf', 'wma', 'wav',
                     'mpg', 'mpeg', 'm4v', 'mp4', 'avi', 'ogm', 'wmv',
                     'mod', 'ape', 'apl', 'm4b', 'm4v', 'm4r', '3gp', 'aac', 
@@ -96,7 +98,9 @@ class player:
         self.current_song_id = None
         self.current_song_duration = 0
         self.status = None
-
+        self.time_playback = 0
+        
+        self.seek = 3000 # ms for seek
         self.volume = 100
         self.pos_move = -1        
         
@@ -113,6 +117,10 @@ class player:
         self.list_active.append_column(columna_one)
         self.list_active.append_column(columna_two)
         self.cellbackground = True
+        
+        pynotify.init("Azucar Aplication")        
+        self.notify = pynotify.Notification("Azucar", "Azucar it's Ok")
+        self.notify.set_timeout(1000)
 
     def __set_signals__(self):
         self.insearch.connect("changed", self.search_song)
@@ -126,7 +134,7 @@ class player:
         self.bt_prev.connect("clicked", self.xmms2_prev)
         self.bt_play.connect("clicked", self.xmms2_start)
         self.bt_stop.connect("clicked", self.xmms2_stop)
-        self.bt_pause.connect("clicked", self.xmms2_pause)
+        self.bt_pause.connect("clicked", self.xmms2_pause)        
         
         try:
             self.xmms.playback_current_id(self.handler_playback_current_id)
@@ -140,6 +148,10 @@ class player:
         except:
             self.logger.critical("Error in hanlder's to xmms2")
     
+    def __get_config(self):
+		if not os.path.isfile( os.path.expanduser( '%s/.config/xmms2/' % os.getenv("HOME") ) ):
+			print "No config created"			
+
     def exit(self):
         gtk.main_quit()
     
@@ -182,9 +194,9 @@ class player:
             self.logger.error('to get selection: __select_row__')
         
     def handler_set_time_track(self, result):
-        total = result.value()
-        min = total/(60*1000)
-        sec = (total - min*1000*60)/1000
+        self.time_playback = result.value()
+        min = self.time_playback/(60*1000)
+        sec = (self.time_playback - min*1000*60)/1000
 
         if len(str(min))==1: min = "0%s" % min
         if len(str(sec))==1: sec = "0%s" % sec
@@ -194,8 +206,9 @@ class player:
         progress = 0.0
         
         if self.current_song_duration > 0:
-            progress = (int(total)*100/int(self.current_song_duration))/100.0            
-        try:
+            progress = (int(self.time_playback)*100/int(self.current_song_duration))/100.0            
+        
+        try:            
             self.playerbar.set_fraction(progress)
         except Exception:
             self.logger.error("%s" % Exception)
@@ -217,10 +230,9 @@ class player:
 
             self.set_cover_information(url_cover)
 
-            notify = pynotify.Notification(track[2], "Album: %s \nArtis: %s" % (track[3], track[1]) )
-            notify.set_icon_from_pixbuf(self.image_cover.get_pixbuf())
-            notify.set_timeout(1000)
-            notify.show()
+            self.notify.update(track[2], "Album: %s \nArtis: %s" % (track[3], track[1]) )            
+            self.notify.set_icon_from_pixbuf(self.image_cover.get_pixbuf())            
+            self.notify.show()
             
     def remove_track(self, position):
         try:
@@ -407,7 +419,17 @@ class player:
         elif mod == "Ctrl+-":
             self.volume_down()
         elif mod == "Ctrl+Q":
-            self.exit()
+            self.exit()    
+        elif keyval == 65363:
+            try:                
+                self.xmms.playback_seek_ms_rel(self.seek)
+            except:
+                print "Exced"
+        elif keyval == 65361:
+            try:
+                self.xmms.playback_seek_ms_rel(self.seek*(-1))
+            except:
+                print "Exced"
 
     def volume_up(self):
         self.volume = (self.volume+10, 100)[self.volume+10>100]
@@ -534,7 +556,6 @@ class player:
         return name.replace('+',' ')
 
     def __set_hotkeys__(self):
-
         key_next = "<Ctrl><Alt>V"        
         keybinder.bind(key_next, self.xmms2_next)
         key_prev = "<Ctrl><Alt>Z"        
@@ -574,3 +595,6 @@ class player:
         current_pos = self.get_song_position(self.current_song_id)
         
         self.xmms.playlist_move(pos, current_pos)        
+	
+    def pulse(self):
+		print "Pasa"
