@@ -11,6 +11,8 @@ import logging
 import time
 import pynotify
 import ConfigParser
+from scrobble import scrobble
+from cover import cover
 
 UI_FILE = "data/player.ui"
 
@@ -24,15 +26,13 @@ class player:
         
         self.builder = gtk.Builder()
         self.builder.add_from_file(UI_FILE)
-        self.window = self.builder.get_object("main")        
+        self.window = self.builder.get_object("main")
 
-        pynotify.init('Azucar')
-        
-        self.__get_config()
+        self.__get_config__()
         self.__properties__()
         self.__set_signals__()
         self.__set_hotkeys__()
-        
+
     def __properties__(self):        
         self.panel_active = self.builder.get_object("panel_active")
         self.scrollplaylist = self.builder.get_object("scrollplaylist")
@@ -52,7 +52,10 @@ class player:
         self.song = self.builder.get_object("lb_song")        
         self.image_cover = self.builder.get_object("cover_image")
         self.timer = self.builder.get_object("lb_timer")
-
+        
+        #self.list_covers = self.builder.get_object("list_covers")        
+        self.scrolledcovers = self.builder.get_object("scrolledcovers")
+                
         attr_timer = pango.AttrList()
         attr_timer.insert(pango.AttrSize(24000, 0, -1)) #font size
         attr_timer.insert(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1)) #font weight
@@ -118,9 +121,24 @@ class player:
         self.list_active.append_column(columna_two)
         self.cellbackground = True
         
-        pynotify.init("Azucar Aplication")        
+        pynotify.init('Azucar')        
         self.notify = pynotify.Notification("Azucar", "Azucar it's Ok")
         self.notify.set_timeout(1000)
+        
+        # scrobbling
+        self.lastfm = scrobble("%s/.config/xmms2/bindata" % os.getenv("HOME"))
+        self.artists = []
+        
+        # covers
+        #self.table_covers = gtk.Table(5, 1, True)
+        self.table_covers = cover(5, 1, True)
+        
+        self.table_covers.show()
+        self.scrolledcovers.add_with_viewport(self.table_covers)
+                
+        #self.list_covers = gtk.VBox(None, 0)
+        #self.scrolledcovers.add_with_viewport(self.list_covers)
+        #self.list_covers.show()
 
     def __set_signals__(self):
         self.insearch.connect("changed", self.search_song)
@@ -148,13 +166,32 @@ class player:
         except:
             self.logger.critical("Error in hanlder's to xmms2")
     
-    def __get_config(self):
+    def __get_config__(self):
 		if not os.path.isfile( os.path.expanduser( '%s/.config/xmms2/' % os.getenv("HOME") ) ):
 			print "No config created"			
-
-    def exit(self):
-        gtk.main_quit()
-    
+	
+    def __select_row__(self, id):
+        try:
+            miter = self.get_iter(id)
+            if miter and self.model_songs == self.list_active.get_model():
+                self.list_active.get_selection().select_iter(miter)
+        except:
+            self.logger.error('to get selection: __select_row__')	
+	
+    def __set_hotkeys__(self):
+        key_next = "<Ctrl><Alt>V"        
+        keybinder.bind(key_next, self.xmms2_next)
+        key_prev = "<Ctrl><Alt>Z"        
+        keybinder.bind(key_prev, self.xmms2_prev)
+        key_start = "<Ctrl><Alt>C"        
+        keybinder.bind(key_start, self.xmms.playback_start)
+        key_pause = "<Ctrl><Alt>X"        
+        keybinder.bind(key_pause, self.xmms.playback_pause)
+        key_clear = "<Ctrl><Alt>B"
+        keybinder.bind(key_clear, self.xmms.playback_stop)
+        key_focus = "<Ctrl><Alt>M"
+        keybinder.bind(key_focus, self.get_focus)	
+		
     def handler_playback_status(self, result):
         self.status = result.value()
     
@@ -184,14 +221,6 @@ class player:
         self.current_song_id = result.value()
         self.xmms.medialib_get_info(result.value(), self.set_track_player)
         self.__select_row__(result.value())
-
-    def __select_row__(self, id):
-        try:
-            miter = self.get_iter(id)
-            if miter and self.model_songs == self.list_active.get_model():
-                self.list_active.get_selection().select_iter(miter)
-        except:
-            self.logger.error('to get selection: __select_row__')
         
     def handler_set_time_track(self, result):
         self.time_playback = result.value()
@@ -212,7 +241,7 @@ class player:
             self.playerbar.set_fraction(progress)
         except Exception:
             self.logger.error("%s" % Exception)
-            
+
     def set_track_player(self, result):
         track = self.get_taginfo(result.value())
         if track:
@@ -223,16 +252,27 @@ class player:
             self.song.set_text("%s" % track[2])
             self.album.set_text("%s" % track[3])
             
-            try:
+            try:                
                 url_cover = "%s/.config/xmms2/bindata/%s" % (os.getenv("HOME"), result.value()['picture_front'])
-            except:
+            except:                
                 url_cover = "data/no-cover.jpg"
+                #url_cover = self.lastfm.get_album_info(track[1], track[3])
 
             self.set_cover_information(url_cover)
 
             self.notify.update(track[2], "Album: %s \nArtis: %s" % (track[3], track[1]) )            
             self.notify.set_icon_from_pixbuf(self.image_cover.get_pixbuf())            
             self.notify.show()
+
+    def set_cover_information(self, url_cover):            
+        try:
+            pixbuf = gtk.gdk.pixbuf_new_from_file(url_cover)
+            scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
+            self.image_cover.set_from_pixbuf(scaled_buf)
+        except:
+            pixbuf = gtk.gdk.pixbuf_new_from_file("data/no-cover.jpg")
+            scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
+            self.image_cover.set_from_pixbuf(scaled_buf)
             
     def remove_track(self, position):
         try:
@@ -248,6 +288,16 @@ class player:
     def add_track(self, result):
         taginfo = self.get_taginfo(result.value())
         try:
+            # taginfo[0] id
+            # taginfo[1] artist
+            # taginfo[2] song
+            # taginfo[3] album
+            # taginfo[4] cover
+            
+            item = {taginfo[1]: {taginfo[3]: taginfo[4]} }
+            if item not in self.artists:
+                self.artists.append(item)
+            
             self.model_songs.append([taginfo[0], taginfo[1], taginfo[2], self.cellbackground])        
             self.cellbackground = (True, False)[self.cellbackground==True]
         except:
@@ -282,53 +332,26 @@ class player:
     
     def get_taginfo(self, info):
         track = []
-
+        
         try:
             track.append(info['id'])
 
-            if info.has_key('artist'):
-                track.append(info["artist"])
-            else:
-                track.append("No artist")
+            if info.has_key('artist'): track.append(info["artist"])
+            else: track.append("No artist")
         
-            if info.has_key('title'):
-                track.append(info["title"])
-            else:
-                track.append(self.get_filename(info['url']))
+            if info.has_key('title'): track.append(info["title"])
+            else: track.append(self.get_filename(info['url']))
 
-            if info.has_key('album'):
-                track.append(info["album"])
-            else:
-                track.append("")
+            if info.has_key('album'): track.append(info["album"])
+            else: track.append("")
+            
+            if info.has_key("picture_front"): track.append(info["picture_front"])
+            else: track.append("")
             
         except:            
             pass
 
         return track
-        
-    def initlogger(self):
-        self.logger = logging.getLogger('xmms2me')
-        hdlr = logging.FileHandler('%s/.config/xmms2/azucar.log' % os.getenv("HOME"))
-        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-        hdlr.setFormatter(formatter)
-        self.logger.addHandler(hdlr)
-        self.logger.setLevel(logging.INFO)
-
-    def search_song(self, widget):
-        if len(widget.get_text())==0:
-            self.list_active.set_reorderable(True)
-        else:
-            self.list_active.set_reorderable(False)
-            
-        modeltemp = gtk.ListStore (int, str, str, 'gboolean')
-        cellbackground = True        
-        for i in self.model_songs:                        
-            match = re.search(r'%s' % widget.get_text().lower(), "%s %s" % (self.model_songs.get_value(i.iter, 1).lower(),self.model_songs.get_value(i.iter, 2).lower()))
-            if match:
-                modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), self.model_songs.get_value(i.iter, 2), cellbackground])
-                cellbackground = (True, False)[cellbackground==True]
-
-        self.list_active.set_model(modeltemp)
         
     def list_active_keypress(self, widget, event):
         try:
@@ -346,16 +369,6 @@ class player:
                 self.app_cover.window.hide()
         except:
             return
-
-    def set_cover_information(self, url_cover):            
-        try:
-            pixbuf = gtk.gdk.pixbuf_new_from_file(url_cover)
-            scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
-            self.image_cover.set_from_pixbuf(scaled_buf)
-        except:
-            pixbuf = gtk.gdk.pixbuf_new_from_file("data/no-cover.jpg")
-            scaled_buf = pixbuf.scale_simple(100,100,gtk.gdk.INTERP_BILINEAR)
-            self.image_cover.set_from_pixbuf(scaled_buf)
         
     def list_active_row_activated(self, widget, iter, path):
         modelo = widget.get_model()
@@ -365,8 +378,7 @@ class player:
     def list_active_drag_data_get(self, treeview, context, selection, target_id, etime):
         treeselection = treeview.get_selection()
         model, iter = treeselection.get_selected()
-        data = model.get_value(iter, 0)        
-        #print data, target_id
+        data = model.get_value(iter, 0)
 
     def list_active_drag_data_received(self, treeview, context, x, y, selection, info, etime):
         treeselection = treeview.get_selection()
@@ -419,7 +431,9 @@ class player:
         elif mod == "Ctrl+-":
             self.volume_down()
         elif mod == "Ctrl+Q":
-            self.exit()    
+            self.exit()
+        elif mod == "Ctrl+T":
+            self.testing()
         elif keyval == 65363:
             try:                
                 self.xmms.playback_seek_ms_rel(self.seek)
@@ -555,20 +569,6 @@ class player:
         
         return name.replace('+',' ')
 
-    def __set_hotkeys__(self):
-        key_next = "<Ctrl><Alt>V"        
-        keybinder.bind(key_next, self.xmms2_next)
-        key_prev = "<Ctrl><Alt>Z"        
-        keybinder.bind(key_prev, self.xmms2_prev)
-        key_start = "<Ctrl><Alt>C"        
-        keybinder.bind(key_start, self.xmms.playback_start)
-        key_pause = "<Ctrl><Alt>X"        
-        keybinder.bind(key_pause, self.xmms.playback_pause)
-        key_clear = "<Ctrl><Alt>B"
-        keybinder.bind(key_clear, self.xmms.playback_stop)
-        key_focus = "<Ctrl><Alt>M"
-        keybinder.bind(key_focus, self.get_focus)
-
     def get_focus(self):
         print self.window.props.is_active
         
@@ -586,6 +586,30 @@ class player:
             if it[0] == id:
                 return it.iter
         return None
+    
+    def initlogger(self):
+        self.logger = logging.getLogger('xmms2me')
+        hdlr = logging.FileHandler('%s/.config/xmms2/azucar.log' % os.getenv("HOME"))
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        hdlr.setFormatter(formatter)
+        self.logger.addHandler(hdlr)
+        self.logger.setLevel(logging.INFO)
+
+    def search_song(self, widget):
+        if len(widget.get_text())==0:
+            self.list_active.set_reorderable(True)
+        else:
+            self.list_active.set_reorderable(False)
+            
+        modeltemp = gtk.ListStore (int, str, str, 'gboolean')
+        cellbackground = True        
+        for i in self.model_songs:                        
+            match = re.search(r'%s' % widget.get_text().lower(), "%s %s" % (self.model_songs.get_value(i.iter, 1).lower(),self.model_songs.get_value(i.iter, 2).lower()))
+            if match:
+                modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), self.model_songs.get_value(i.iter, 2), cellbackground])
+                cellbackground = (True, False)[cellbackground==True]
+
+        self.list_active.set_model(modeltemp)
         
     def jump_item(self):        
         treeselection = self.list_active.get_selection()
@@ -595,6 +619,29 @@ class player:
         current_pos = self.get_song_position(self.current_song_id)
         
         self.xmms.playlist_move(pos, current_pos)        
-	
-    def pulse(self):
-		print "Pasa"
+
+    def exit(self):
+		gtk.main_quit()
+		
+    def testing(self):        
+        #self.table_covers.addCover()        
+        # self.list_covers.pack_start(gtklayout, False, True, 1)
+        print self.lastfm.get_album_info("Delphic", "Acolyte")
+        pass
+
+
+class Album:
+    def __init__(self, album, artist, url_cover):
+        self.album = album
+        self.artist = artist
+        self.url_cover = url_cover
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
