@@ -24,7 +24,7 @@
             <property name="tab_pos">left</property>
             <property name="tab_hborder">10</property>
             <child>
-              <object class="GtkFixed" id="fixed1">
+              <object class="GtkFixed" id="fx_scrobbling">
                 <property name="visible">True</property>
                 <child>
                   <object class="GtkCheckButton" id="ch_scrobbler_status">
@@ -182,7 +182,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="label1">
+                      <object class="GtkLabel" id="lb_lastfm_title">
                         <property name="width_request">132</property>
                         <property name="height_request">25</property>
                         <property name="visible">True</property>
@@ -210,11 +210,53 @@
               </packing>
             </child>
             <child>
-              <object class="GtkFixed" id="fixed2">
+              <object class="GtkFixed" id="fx_global_keys">
                 <property name="visible">True</property>
+                <child>
+                  <object class="GtkLabel" id="lb_gk_title">
+                    <property name="width_request">441</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">Global Keys Configuration</property>
+                  </object>
+                  <packing>
+                    <property name="x">21</property>
+                    <property name="y">15</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkTreeView" id="tv_gk_list">
+                    <property name="width_request">442</property>
+                    <property name="height_request">290</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                  </object>
+                  <packing>
+                    <property name="x">22</property>
+                    <property name="y">47</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="position">1</property>
+              </packing>
+            </child>
+            <child type="tab">
+              <object class="GtkLabel" id="lb_global_keys">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Global Keys</property>
+              </object>
+              <packing>
+                <property name="position">1</property>
+                <property name="tab_fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkFixed" id="fx_about">
+                <property name="visible">True</property>
+              </object>
+              <packing>
+                <property name="position">2</property>
               </packing>
             </child>
             <child type="tab">
@@ -223,7 +265,7 @@
                 <property name="label" translatable="yes">About</property>
               </object>
               <packing>
-                <property name="position">1</property>
+                <property name="position">2</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>

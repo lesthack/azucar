@@ -156,7 +156,7 @@ class player:
         self.bt_pause.connect("clicked", self.xmms2_pause)
         self.bt_albums.connect("clicked", self.toggle_list)
         self.bt_options.connect("clicked", self.show_config)
-        
+        self.playerbar.connect("button-press-event", self.testing)
         try:
             self.xmms.playback_current_id(self.handler_playback_current_id)                           
             self.xmms.signal_playback_playtime(self.handler_set_time_track)
@@ -637,12 +637,18 @@ class player:
             self.list_active.set_visible(True)
             self.scrolledcovers.set_visible(False)
 		
-    def testing(self):        
+    def testing(self, widget=None, event=None):        
         #self.table_covers.addCover()        
         
-        lista_albums = albums()
+        #lista_albums = albums()
         
+        width, height = widget.get_size_request()
+        x, y = event.get_coords()        
+        percent = x*100/width        
+        pos = percent*self.current_song_duration/100
         
+        self.xmms.playback_seek_ms(pos)
+
         #p = multiprocessing.Process(target=self.lastfm.get_album_info, args=("Delphic", "Acolyte"))
         #p.start()
         
