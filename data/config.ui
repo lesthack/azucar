@@ -112,7 +112,7 @@
                 <child>
                   <object class="GtkFixed" id="fx_login">
                     <property name="width_request">434</property>
-                    <property name="height_request">94</property>
+                    <property name="height_request">86</property>
                     <child>
                       <object class="GtkLabel" id="lb_scrobbler_username">
                         <property name="width_request">100</property>
@@ -122,7 +122,7 @@
                         <property name="justify">right</property>
                       </object>
                       <packing>
-                        <property name="x">18</property>
+                        <property name="x">7</property>
                         <property name="y">16</property>
                       </packing>
                     </child>
@@ -135,7 +135,7 @@
                         <property name="justify">right</property>
                       </object>
                       <packing>
-                        <property name="x">18</property>
+                        <property name="x">10</property>
                         <property name="y">46</property>
                       </packing>
                     </child>
@@ -183,8 +183,8 @@
                     </child>
                   </object>
                   <packing>
-                    <property name="x">37</property>
-                    <property name="y">226</property>
+                    <property name="x">35</property>
+                    <property name="y">224</property>
                   </packing>
                 </child>
               </object>

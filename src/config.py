@@ -69,17 +69,19 @@ class config:
             text_temp = " Xmms2-scrobbler installed: YES\n"
             self.ch_sc_status.set_active(True)
             
-            text_configure_directory = ("NO","YES")[os.path.isdir(self.path_scrobbler_config)]
-            text_configure_lastfm = ("NO","YES")[os.path.isdir(self.path_scrobbler_lastfm)]
-            text_configure_lastfm_config = ("NO","YES")[os.path.isfile("%s/config" % self.path_scrobbler_lastfm)]
+            text_configure_directory = os.path.isdir(self.path_scrobbler_config)
+            text_configure_lastfm = os.path.isdir(self.path_scrobbler_lastfm)
+            text_configure_lastfm_config = os.path.isfile("%s/config" % self.path_scrobbler_lastfm)
+            text_configure_symbolic_link = os.path.isfile("%s/startup.d/xmms2-scrobbler" % self.path_xmms2_config)
             
-            text_temp += " Exist Xmms2 Configure Directory: %s\n" % text_configure_directory
-            text_temp += " Exist Scrobbler Config Directory: %s\n" % text_configure_lastfm
-            text_temp += " Exist LastFm Config File: %s\n" % text_configure_lastfm_config
+            text_temp += " Exist Xmms2 Configure Directory: %s\n" % ("NO","YES")[text_configure_directory]
+            text_temp += " Exist Scrobbler Config Directory: %s\n" % ("NO","YES")[text_configure_lastfm]
+            text_temp += " Exist LastFm Config File: %s\n" % ("NO","YES")[text_configure_lastfm_config]
+            text_temp += " Exist Scrobbler Symbolic Link: %s\n" % ("NO","YES")[text_configure_symbolic_link]
             
             textbuffer.set_text(text_temp)
             
-            if text_configure_directory == "YES" and text_configure_lastfm == "YES" and text_configure_lastfm_config == "YES": 
+            if text_configure_directory and text_configure_lastfm and text_configure_lastfm_config and text_configure_symbolic_link: 
                 self.bt_sc_auto.set_label("OK")
                 self.bt_sc_auto.set_sensitive(False)
                 
@@ -137,7 +139,12 @@ class config:
             
             self.scrobbling_save_config()
         
+        if not os.path.isfile("%s/startup.d/xmms2-scrobbler" % self.path_xmms2_config):
+			os.symlink(self.path_scrobbler_bin, "%s/startup.d/xmms2-scrobbler" % self.path_xmms2_config)
+			
         textbuffer.set_text(text_temp)
+        
+        self.scrobbling_check_config()
         
     def xmms2_list_plugins(self, result):
         print result.value()
