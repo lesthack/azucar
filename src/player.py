@@ -11,6 +11,7 @@ import logging
 import time
 import pynotify
 import ConfigParser
+import multiprocessing
 from scrobble import scrobble
 from cover import cover
 
@@ -126,7 +127,7 @@ class player:
         self.notify.set_timeout(1000)
         
         # scrobbling
-        self.lastfm = scrobble("%s/.config/xmms2/bindata" % os.getenv("HOME"))
+        self.lastfm = scrobble("%s/.config/xmms2/bindata" % os.getenv("HOME"), "data/no-cover.jpg")
         self.artists = []
         
         # covers
@@ -152,19 +153,21 @@ class player:
         self.bt_prev.connect("clicked", self.xmms2_prev)
         self.bt_play.connect("clicked", self.xmms2_start)
         self.bt_stop.connect("clicked", self.xmms2_stop)
-        self.bt_pause.connect("clicked", self.xmms2_pause)        
+        self.bt_pause.connect("clicked", self.xmms2_pause)
+        self.bt_albums.connect("clicked", self.toggle_list)
         
         try:
-            self.xmms.playback_current_id(self.handler_playback_current_id)
-            self.xmms.playlist_list_entries('_active', self.get_tracks)                
+            self.xmms.playback_current_id(self.handler_playback_current_id)                           
             self.xmms.signal_playback_playtime(self.handler_set_time_track)
             self.xmms.playback_status(self.handler_playback_status)
             self.xmms.broadcast_playlist_changed(self.handler_playlist_change)
             self.xmms.broadcast_playback_current_id(self.handler_playback_current_id)
             self.xmms.broadcast_playback_status(self.handler_playback_status)
             self.xmms.playback_volume_get(self.xmms2_volume)
+            self.xmms.playlist_list_entries('_active', self.get_tracks)
+            self.load_list_songs()
         except:
-            self.logger.critical("Error in hanlder's to xmms2")
+            self.logger.critical("Error in hanlder's to xmms2")    
     
     def __get_config__(self):
 		if not os.path.isfile( os.path.expanduser( '%s/.config/xmms2/' % os.getenv("HOME") ) ):
@@ -281,10 +284,10 @@ class player:
             self.logger.error("Can't remove position: %s" % position)
         
     def get_tracks(self, result):
-        playlist = result.value()
+        playlist = result.value()        
         for element in playlist:
-            self.xmms.medialib_get_info(element, self.add_track)
-
+            self.xmms.medialib_get_info(element, self.add_track)        
+    
     def add_track(self, result):
         taginfo = self.get_taginfo(result.value())
         try:
@@ -621,22 +624,51 @@ class player:
         self.xmms.playlist_move(pos, current_pos)        
 
     def exit(self):
-		gtk.main_quit()
+        gtk.main_quit()
+	
+    def toggle_list(self, widget=None):
+        if self.list_active.get_visible(): 
+            self.list_active.set_visible(False)
+            self.scrolledcovers.set_visible(True)
+        else:
+            self.list_active.set_visible(True)
+            self.scrolledcovers.set_visible(False)
 		
     def testing(self):        
         #self.table_covers.addCover()        
-        # self.list_covers.pack_start(gtklayout, False, True, 1)
-        print self.lastfm.get_album_info("Delphic", "Acolyte")
+        
+        lista_albums = albums()
+        
+        
+        #p = multiprocessing.Process(target=self.lastfm.get_album_info, args=("Delphic", "Acolyte"))
+        #p.start()
+        
+        #print self.lastfm.get_album_info("Delphic", "Acolyte")
         pass
 
-
-class Album:
+    
+    
+class album:    
     def __init__(self, album, artist, url_cover):
         self.album = album
         self.artist = artist
         self.url_cover = url_cover
+        
+class albums:
+    def __init__(self):
+        self.list = []
+        self._list = []
+        pass
+    
+    def add_album(self, album, artist, url_cover):
+        if album not in self.list:
+            self.list.append(album)
+            self._list.append( album(album, artist, url_cover) )
     
     
+    def get_album(self, album):
+        if album in self.list:
+            return self._list[]
     
     
     
