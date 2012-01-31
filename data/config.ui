@@ -1,0 +1,259 @@
+<?xml version="1.0"?>
+<interface>
+  <requires lib="gtk+" version="2.16"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkWindow" id="window_config">
+    <property name="width_request">600</property>
+    <property name="height_request">400</property>
+    <property name="title" translatable="yes">Azucar Configuration</property>
+    <property name="resizable">False</property>
+    <property name="modal">True</property>
+    <property name="window_position">center</property>
+    <property name="type_hint">dialog</property>
+    <property name="gravity">center</property>
+    <child>
+      <object class="GtkVBox" id="vbox_config">
+        <property name="height_request">400</property>
+        <property name="visible">True</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkNotebook" id="tab_config">
+            <property name="height_request">370</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="tab_pos">left</property>
+            <property name="tab_hborder">10</property>
+            <child>
+              <object class="GtkFixed" id="fixed1">
+                <property name="visible">True</property>
+                <child>
+                  <object class="GtkCheckButton" id="ch_scrobbler_status">
+                    <property name="label" translatable="yes">Xmms2 Scrobbler Installed</property>
+                    <property name="width_request">200</property>
+                    <property name="height_request">30</property>
+                    <property name="visible">True</property>
+                    <property name="sensitive">False</property>
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
+                    <property name="xalign">0</property>
+                    <property name="yalign">0</property>
+                    <property name="draw_indicator">True</property>
+                  </object>
+                  <packing>
+                    <property name="x">10</property>
+                    <property name="y">5</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLayout" id="ly_lastfm">
+                    <property name="width_request">440</property>
+                    <property name="height_request">173</property>
+                    <property name="visible">True</property>
+                    <child>
+                      <object class="GtkLabel" id="lb_scrobbler_info">
+                        <property name="width_request">100</property>
+                        <property name="height_request">30</property>
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Autoconfigure:</property>
+                      </object>
+                      <packing>
+                        <property name="x">278</property>
+                        <property name="y">131</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bt_scrobbler_auto">
+                        <property name="label" translatable="yes">Do
+</property>
+                        <property name="width_request">50</property>
+                        <property name="height_request">25</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                      </object>
+                      <packing>
+                        <property name="x">380</property>
+                        <property name="y">134</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkTextView" id="tx_scrobbler_status">
+                        <property name="width_request">416</property>
+                        <property name="height_request">94</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="pixels_above_lines">1</property>
+                        <property name="editable">False</property>
+                        <property name="cursor_visible">False</property>
+                      </object>
+                      <packing>
+                        <property name="x">16</property>
+                        <property name="y">32</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="lb_scrobbler_title">
+                        <property name="width_request">100</property>
+                        <property name="height_request">20</property>
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Status Check:</property>
+                      </object>
+                      <packing>
+                        <property name="x">8</property>
+                        <property name="y">9</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="x">36</property>
+                    <property name="y">54</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFixed" id="fx_login">
+                    <property name="width_request">434</property>
+                    <property name="height_request">94</property>
+                    <child>
+                      <object class="GtkLabel" id="lb_scrobbler_username">
+                        <property name="width_request">100</property>
+                        <property name="height_request">25</property>
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Username:</property>
+                        <property name="justify">right</property>
+                      </object>
+                      <packing>
+                        <property name="x">18</property>
+                        <property name="y">16</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="lb_scrobbler_password">
+                        <property name="width_request">100</property>
+                        <property name="height_request">25</property>
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Password:</property>
+                        <property name="justify">right</property>
+                      </object>
+                      <packing>
+                        <property name="x">18</property>
+                        <property name="y">46</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="in_scrobbler_username">
+                        <property name="width_request">150</property>
+                        <property name="height_request">25</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="invisible_char">&#x2022;</property>
+                      </object>
+                      <packing>
+                        <property name="x">108</property>
+                        <property name="y">17</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="in_scrobbler_password">
+                        <property name="width_request">150</property>
+                        <property name="height_request">25</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="visibility">False</property>
+                        <property name="invisible_char">&#x2022;</property>
+                        <property name="invisible_char_set">True</property>
+                      </object>
+                      <packing>
+                        <property name="x">108</property>
+                        <property name="y">46</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bt_scrobbler_save">
+                        <property name="label" translatable="yes">Save</property>
+                        <property name="width_request">100</property>
+                        <property name="height_request">25</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                      </object>
+                      <packing>
+                        <property name="x">270</property>
+                        <property name="y">47</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="x">37</property>
+                    <property name="y">226</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+            <child type="tab">
+              <object class="GtkLabel" id="lb_scrobbling">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Scrobbling</property>
+              </object>
+              <packing>
+                <property name="tab_fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkFixed" id="fixed2">
+                <property name="visible">True</property>
+              </object>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child type="tab">
+              <object class="GtkLabel" id="lb_about">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">About</property>
+              </object>
+              <packing>
+                <property name="position">1</property>
+                <property name="tab_fill">False</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkHButtonBox" id="group_buttons">
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <object class="GtkButton" id="bt_close">
+                <property name="label" translatable="yes">Close</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="pack_type">end</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

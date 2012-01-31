@@ -12,8 +12,8 @@ import time
 import pynotify
 import ConfigParser
 import multiprocessing
-#from scrobble import scrobble
-from cover import cover
+import cover
+import config
 
 UI_FILE = "data/player.ui"
 
@@ -28,7 +28,7 @@ class player:
         self.builder = gtk.Builder()
         self.builder.add_from_file(UI_FILE)
         self.window = self.builder.get_object("main")
-
+        
         self.__get_config__()
         self.__properties__()
         self.__set_signals__()
@@ -132,7 +132,7 @@ class player:
         
         # covers
         #self.table_covers = gtk.Table(5, 1, True)
-        self.table_covers = cover(5, 1, True)
+        self.table_covers = cover.cover(5, 1, True)
         
         self.table_covers.show()
         self.scrolledcovers.add_with_viewport(self.table_covers)
@@ -155,6 +155,7 @@ class player:
         self.bt_stop.connect("clicked", self.xmms2_stop)
         self.bt_pause.connect("clicked", self.xmms2_pause)
         self.bt_albums.connect("clicked", self.toggle_list)
+        self.bt_options.connect("clicked", self.show_config)
         
         try:
             self.xmms.playback_current_id(self.handler_playback_current_id)                           
@@ -431,6 +432,8 @@ class player:
             self.volume_down()
         elif mod == "Ctrl+Q":
             self.exit()
+        elif mod == "Ctrl+Alt+P":
+            self.show_config()
         elif mod == "Ctrl+T":
             self.testing()
         elif keyval == 65363:
@@ -618,7 +621,11 @@ class player:
         current_pos = self.get_song_position(self.current_song_id)
         
         self.xmms.playlist_move(pos, current_pos)        
-
+    
+    def show_config(self, widget=None):    
+        self.window_config = config.config(self.xmms)
+        self.window_config.show()
+        
     def exit(self):
         gtk.main_quit()
 	
@@ -644,27 +651,27 @@ class player:
 
     
     
-# class album:    
-    # def __init__(self, album, artist, url_cover):
-        # self.album = album
-        # self.artist = artist
-        # self.url_cover = url_cover
+class album:    
+    def __init__(self, album, artist, url_cover):
+        self.album = album
+        self.artist = artist
+        self.url_cover = url_cover
         
-# class albums:
-    # def __init__(self):
-        # self.list = []
-        # self._list = []
-        # pass
+class albums:
+    def __init__(self):
+        self.list = []
+        self._list = []
+        pass
     
-    # def add_album(self, album, artist, url_cover):
-        # if album not in self.list:
-            # self.list.append(album)
-            # self._list.append( album(album, artist, url_cover) )
+    def add_album(self, album, artist, url_cover):
+        if album not in self.list:
+            self.list.append(album)
+            self._list.append( album(album, artist, url_cover) )
     
     
-    # def get_album(self, album):
-        # if album in self.list:
-            # return self._list[]
+    def get_album(self, album):
+        if album in self.list:
+            pass
     
     
     
