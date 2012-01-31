@@ -12,7 +12,7 @@ import time
 import pynotify
 import ConfigParser
 import multiprocessing
-from scrobble import scrobble
+#from scrobble import scrobble
 from cover import cover
 
 UI_FILE = "data/player.ui"
@@ -127,8 +127,8 @@ class player:
         self.notify.set_timeout(1000)
         
         # scrobbling
-        self.lastfm = scrobble("%s/.config/xmms2/bindata" % os.getenv("HOME"), "data/no-cover.jpg")
-        self.artists = []
+        #self.lastfm = scrobble("%s/.config/xmms2/bindata" % os.getenv("HOME"), "data/no-cover.jpg")
+        #self.artists = []
         
         # covers
         #self.table_covers = gtk.Table(5, 1, True)
@@ -296,10 +296,6 @@ class player:
             # taginfo[2] song
             # taginfo[3] album
             # taginfo[4] cover
-            
-            item = {taginfo[1]: {taginfo[3]: taginfo[4]} }
-            if item not in self.artists:
-                self.artists.append(item)
             
             self.model_songs.append([taginfo[0], taginfo[1], taginfo[2], self.cellbackground])        
             self.cellbackground = (True, False)[self.cellbackground==True]
