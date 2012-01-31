@@ -22,6 +22,7 @@ class config:
         
         # lastfm
         self.path_scrobbler_lastfm = "%s/lastfm" % self.path_scrobbler_config        
+        self.lastfm_handshake = "http://post.audioscrobbler.com" 
         
         self.__properties__()
         self.__set_signals__()
@@ -44,6 +45,7 @@ class config:
         
     def __set_signals__(self):
         self.bt_close.connect("clicked", self.close_window)
+        self.bt_sc_save.connect("clicked", self.scrobbling_save_config)
 
     def __checks__(self):
         self.scrobbling_check_config()
@@ -54,7 +56,7 @@ class config:
     def show(self):
         self.window.show()
     
-    def scrobbling_check_config(self):        
+    def scrobbling_check_config(self):
         textbuffer = self.tx_sc_status.get_buffer()
         
         if self.xmms2_has_scrobbler():
@@ -76,9 +78,9 @@ class config:
                 self.bt_sc_auto.set_sensitive(False)
                 
                 config_file = open("%s/config" % self.path_scrobbler_lastfm, "r")
-                lines = [i for i in config_file.readlines()[:-1]] 
+                lines = [i for i in config_file.readlines()] 
                 
-                if len(lines) == 3:
+                if len(lines) > 2:
                     username = lines[0].split(": ")[1][:-1]
                     password = lines[1].split(": ")[1][:-1]                    
                     
@@ -93,7 +95,14 @@ class config:
             self.ch_sc_status.set_active(False)
             self.lb_sc_info.set_visible(False)
             self.bt_sc_auto.set_visible(False)        
-            
+    
+    def scrobbling_save_config(self, widget=None):            
+        config_file = open("%s/config" % self.path_scrobbler_lastfm, "w")
+        config_file.write("user: %s\n" % self.in_sc_username.get_text())
+        config_file.write("password: %s\n" % self.in_sc_password.get_text())
+        config_file.write("handshake_url: %s\n" % self.lastfm_handshake)
+        config_file.close()
+        
     def xmms2_list_plugins(self, result):
         print result.value()
     
