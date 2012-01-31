@@ -5,6 +5,8 @@ import gobject
 import gtk
 import pango
 import os
+import time
+import threading
 
 class config:
     
@@ -26,11 +28,12 @@ class config:
         
         self.__properties__()
         self.__set_signals__()
-        self.__checks__()
+        self.__checks__()        
         
     def __properties__(self):        
         # Generals
         self.bt_close = self.builder.get_object("bt_close")
+        self.lb_config_status = self.builder.get_object("lb_config_status")
         
         # Scrobbling
         # self.xmms.plugin_list(1, self.xmms2_list_plugins)
@@ -45,8 +48,11 @@ class config:
         
     def __set_signals__(self):
         self.bt_close.connect("clicked", self.close_window)
-        self.bt_sc_save.connect("clicked", self.scrobbling_save_config)
-
+        
+        # Scrobbling
+        self.bt_sc_save.connect("clicked", self.scrobbling_save_config)        
+        self.bt_sc_auto.connect("clicked", self.scrobbling_autoconfigure)
+        
     def __checks__(self):
         self.scrobbling_check_config()
             
@@ -103,6 +109,36 @@ class config:
         config_file.write("handshake_url: %s\n" % self.lastfm_handshake)
         config_file.close()
         
+        self.lb_config_status.set_text("Config Saved...")
+        self.hide_status()
+    
+    def scrobbling_autoconfigure(self, widget=None):
+        text_temp = ""
+        textbuffer = self.tx_sc_status.get_buffer()                
+        textbuffer.set_text(text_temp)
+        
+        if not os.path.isdir(self.path_scrobbler_config):
+            os.mkdir(self.path_scrobbler_config)
+            text_temp += "Doing scrobbler directory...\n"
+        
+        textbuffer.set_text(text_temp)
+            
+        if not os.path.isdir(self.path_scrobbler_lastfm):
+            os.mkdir(self.path_scrobbler_lastfm)
+            text_temp += "Doing lastfm directory...\n"
+        
+        textbuffer.set_text(text_temp)
+        
+        if not os.path.isfile("%s/config" % self.path_scrobbler_lastfm):
+            self.in_sc_username.set_text("foo")
+            self.in_sc_password.set_text("bar")
+            
+            text_temp += "Doing lastfm config file...\n"
+            
+            self.scrobbling_save_config()
+        
+        textbuffer.set_text(text_temp)
+        
     def xmms2_list_plugins(self, result):
         print result.value()
     
@@ -110,3 +146,12 @@ class config:
         if os.path.isfile(self.path_scrobbler_bin):
             return True
         return False
+    
+    def hide_status(self):
+        thtemp = threading.Thread(target=self.__hide_status__)
+        thtemp.start()
+
+    def __hide_status__(self):        
+        time.sleep(0.5)
+        self.lb_config_status.set_text("")        
+        

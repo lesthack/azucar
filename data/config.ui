@@ -227,7 +227,14 @@
             <property name="visible">True</property>
             <property name="layout_style">end</property>
             <child>
-              <placeholder/>
+              <object class="GtkLabel" id="lb_config_status">
+                <property name="visible">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <object class="GtkButton" id="bt_close">
