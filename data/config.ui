@@ -47,7 +47,7 @@
                 <child>
                   <object class="GtkLayout" id="ly_lastfm">
                     <property name="width_request">440</property>
-                    <property name="height_request">173</property>
+                    <property name="height_request">165</property>
                     <property name="visible">True</property>
                     <child>
                       <object class="GtkLabel" id="lb_scrobbler_info">
@@ -105,8 +105,8 @@
                     </child>
                   </object>
                   <packing>
-                    <property name="x">36</property>
-                    <property name="y">54</property>
+                    <property name="x">32</property>
+                    <property name="y">50</property>
                   </packing>
                 </child>
                 <child>
@@ -123,7 +123,7 @@
                       </object>
                       <packing>
                         <property name="x">7</property>
-                        <property name="y">16</property>
+                        <property name="y">24</property>
                       </packing>
                     </child>
                     <child>
@@ -136,7 +136,7 @@
                       </object>
                       <packing>
                         <property name="x">10</property>
-                        <property name="y">46</property>
+                        <property name="y">54</property>
                       </packing>
                     </child>
                     <child>
@@ -149,7 +149,7 @@
                       </object>
                       <packing>
                         <property name="x">108</property>
-                        <property name="y">17</property>
+                        <property name="y">24</property>
                       </packing>
                     </child>
                     <child>
@@ -164,7 +164,7 @@
                       </object>
                       <packing>
                         <property name="x">108</property>
-                        <property name="y">46</property>
+                        <property name="y">54</property>
                       </packing>
                     </child>
                     <child>
@@ -181,10 +181,21 @@
                         <property name="y">47</property>
                       </packing>
                     </child>
+                    <child>
+                      <object class="GtkLabel" id="label1">
+                        <property name="width_request">132</property>
+                        <property name="height_request">25</property>
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Last.fm login:</property>
+                      </object>
+                      <packing>
+                        <property name="x">117</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="x">35</property>
-                    <property name="y">224</property>
+                    <property name="y">229</property>
                   </packing>
                 </child>
               </object>
