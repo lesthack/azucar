@@ -122,7 +122,7 @@ class player:
         self.list_active.append_column(columna_two)
         self.cellbackground = True
         
-        pynotify.init('Azucar')        
+        pynotify.init('Azucar')            
         self.notify = pynotify.Notification("Azucar", "Azucar it's Ok")
         self.notify.set_timeout(1000)
         
@@ -436,32 +436,22 @@ class player:
             self.show_config()
         elif mod == "Ctrl+T":
             self.testing()
-        elif keyval == 65363:
-            try:                
-                self.xmms.playback_seek_ms_rel(self.seek)
-            except:
-                print "Exced"
-        elif keyval == 65361:
-            try:
-                self.xmms.playback_seek_ms_rel(self.seek*(-1))
-            except:
-                print "Exced"
 
     def volume_up(self):
         self.volume = (self.volume+10, 100)[self.volume+10>100]
         self.xmms.playback_volume_set('master', self.volume)
-
-        notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
-        notify.set_timeout(500)
-        notify.show()
+                
+        self.notify.update("Volume", "%d%s" % (self.volume,'%') )                    
+        #self.notify.set_icon_from_pixbuf(icon)
+        self.notify.show()        
         
     def volume_down(self):
         self.volume = (self.volume-10, 0)[self.volume-10<=0]
         self.xmms.playback_volume_set('master', self.volume)            
-
-        notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
-        notify.set_timeout(500)
-        notify.show()    
+                
+        self.notify.update("Volume", "%d%s" % (self.volume,'%'))            
+        #self.notify.set_icon_from_pixbuf(icon)
+        self.notify.show()
     
     def xmms2_volume(self, result):
         try:
