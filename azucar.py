@@ -20,6 +20,7 @@
 import sys
 import os
 import gobject
+import gtk
 
 try:
     __file__
@@ -70,8 +71,11 @@ except ImportError:
 def main():
 	conn = xmmsclient.glib.GLibConnector(xmms)
 	app = player(xmms)
-	app.window.show()	
+	app.window.show()
+	gtk.gdk.threads_init()
+	gtk.gdk.threads_enter()
 	gtk.main()
+	gtk.gdk.threads_leave()	
 
 if __name__ == "__main__":
     sys.exit(main())

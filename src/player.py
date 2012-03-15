@@ -122,7 +122,7 @@ class player:
         self.list_active.append_column(columna_two)
         self.cellbackground = True
         
-        pynotify.init('Azucar')            
+        pynotify.init('Azucar')        
         self.notify = pynotify.Notification("Azucar", "Azucar it's Ok")
         self.notify.set_timeout(1000)
         
@@ -436,22 +436,32 @@ class player:
             self.show_config()
         elif mod == "Ctrl+T":
             self.testing()
+        elif keyval == 65363:
+            try:                
+                self.xmms.playback_seek_ms_rel(self.seek)
+            except:
+                print "Exced"
+        elif keyval == 65361:
+            try:
+                self.xmms.playback_seek_ms_rel(self.seek*(-1))
+            except:
+                print "Exced"
 
     def volume_up(self):
         self.volume = (self.volume+10, 100)[self.volume+10>100]
         self.xmms.playback_volume_set('master', self.volume)
-                
-        self.notify.update("Volume", "%d%s" % (self.volume,'%') )                    
-        #self.notify.set_icon_from_pixbuf(icon)
-        self.notify.show()        
+
+        notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
+        notify.set_timeout(500)
+        notify.show()
         
     def volume_down(self):
         self.volume = (self.volume-10, 0)[self.volume-10<=0]
         self.xmms.playback_volume_set('master', self.volume)            
-                
-        self.notify.update("Volume", "%d%s" % (self.volume,'%'))            
-        #self.notify.set_icon_from_pixbuf(icon)
-        self.notify.show()
+
+        notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
+        notify.set_timeout(500)
+        notify.show()    
     
     def xmms2_volume(self, result):
         try:
@@ -631,7 +641,7 @@ class player:
         #self.table_covers.addCover()        
         
         #lista_albums = albums()
-        
+        pass
         width, height = widget.get_size_request()
         x, y = event.get_coords()        
         percent = x*100/width        
@@ -645,34 +655,5 @@ class player:
         #print self.lastfm.get_album_info("Delphic", "Acolyte")
         pass
 
-    
-    
-class album:    
-    def __init__(self, album, artist, url_cover):
-        self.album = album
-        self.artist = artist
-        self.url_cover = url_cover
-        
-class albums:
-    def __init__(self):
-        self.list = []
-        self._list = []
-        pass
-    
-    def add_album(self, album, artist, url_cover):
-        if album not in self.list:
-            self.list.append(album)
-            self._list.append( album(album, artist, url_cover) )
-    
-    
-    def get_album(self, album):
-        if album in self.list:
-            pass
-    
-    
-    
-    
-    
-    
     
     

@@ -7,10 +7,11 @@ import os
 from xml.dom.minidom import parse, parseString
 
 class scrobble:
-    def __init__(self, path):
+    def __init__(self, path_temp, path_default):
         self.__api_key__ = "b25b959554ed76058ac220b7b2e0a026"        
         self.ws = "http://ws.audioscrobbler.com/2.0/"
-        self.path = path
+        self.path = path_temp
+        self.path_default = path_default
         
     def get_apikey(self):
         return self.__api_key__
@@ -48,7 +49,8 @@ class scrobble:
                     url_image = self.__get_text__(image.childNodes)                
                     path_image = "%s/currentcover.%s" % (self.path, url_image[-3:])
                     request = urllib.urlretrieve(url_image, path_image )
+                    print path_image
                     return path_image
                 except:
-                    return "data/no-cover.jpg"
+                    return self.path_default
                 
