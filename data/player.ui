@@ -1,9 +1,67 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="2.16"/>
-  <!-- interface-naming-policy project-wide -->
+  <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkImage" id="img_albums">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="xalign">0</property>
+    <property name="yalign">0</property>
+    <property name="pixbuf">icons/music-library.png</property>
+    <property name="icon-size">2</property>
+  </object>
+  <object class="GtkImage" id="img_next">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="xalign">0</property>
+    <property name="yalign">0</property>
+    <property name="pixbuf">icons/media-skip-forward.png</property>
+    <property name="icon-size">2</property>
+  </object>
+  <object class="GtkImage" id="img_options">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="xalign">0</property>
+    <property name="yalign">0</property>
+    <property name="pixbuf">icons/options.png</property>
+    <property name="icon-size">2</property>
+  </object>
+  <object class="GtkImage" id="img_pause">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">icons/media-playback-pause.png</property>
+    <property name="icon-size">2</property>
+  </object>
+  <object class="GtkImage" id="img_play">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">icons/media-playback-start.png</property>
+    <property name="icon-size">2</property>
+  </object>
+  <object class="GtkImage" id="img_prev">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">icons/media-skip-backward.png</property>
+    <property name="icon-size">2</property>
+  </object>
+  <object class="GtkImage" id="img_repeat">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="xalign">0</property>
+    <property name="yalign">0</property>
+    <property name="pixbuf">icons/media-playlist-repeat.png</property>
+    <property name="icon-size">2</property>
+  </object>
+  <object class="GtkImage" id="img_stop">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="xalign">0</property>
+    <property name="yalign">0</property>
+    <property name="pixbuf">icons/media-playback-stop.png</property>
+    <property name="icon-size">2</property>
+  </object>
   <object class="GtkWindow" id="main">
     <property name="width_request">550</property>
+    <property name="can_focus">False</property>
     <property name="title" translatable="yes">Azucar</property>
     <property name="window_position">center</property>
     <property name="default_width">500</property>
@@ -13,17 +71,19 @@
       <object class="GtkVBox" id="vbox_content">
         <property name="width_request">550</property>
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
+        <property name="can_focus">False</property>
         <child>
           <object class="GtkHBox" id="hbox_cover">
             <property name="width_request">550</property>
             <property name="height_request">100</property>
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <child>
               <object class="GtkImage" id="cover_image">
                 <property name="width_request">100</property>
                 <property name="height_request">100</property>
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="xalign">0</property>
                 <property name="yalign">0</property>
                 <property name="pixbuf">no-cover.jpg</property>
@@ -37,11 +97,13 @@
             <child>
               <object class="GtkLayout" id="layout_information">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <child>
                   <object class="GtkLabel" id="lb_song">
                     <property name="width_request">335</property>
                     <property name="height_request">20</property>
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="label" translatable="yes">Song</property>
                     <attributes>
@@ -58,6 +120,7 @@
                     <property name="width_request">335</property>
                     <property name="height_request">15</property>
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="label" translatable="yes">Artist</property>
                     <attributes>
@@ -74,6 +137,7 @@
                     <property name="width_request">335</property>
                     <property name="height_request">15</property>
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="label" translatable="yes">Album</property>
                   </object>
@@ -87,6 +151,7 @@
                     <property name="width_request">100</property>
                     <property name="height_request">80</property>
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="label" translatable="yes">00:00</property>
                   </object>
                   <packing>
@@ -96,6 +161,8 @@
                 </child>
               </object>
               <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -111,10 +178,8 @@
             <property name="width_request">550</property>
             <property name="height_request">20</property>
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <property name="events">GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK</property>
-            <property name="activity_mode">True</property>
-            <property name="text_xalign">0</property>
-            <property name="text_yalign">0</property>
             <property name="pulse_step">0.01</property>
           </object>
           <packing>
@@ -126,64 +191,46 @@
         <child>
           <object class="GtkVBox" id="panel_active">
             <property name="visible">True</property>
-            <property name="orientation">vertical</property>
+            <property name="can_focus">False</property>
             <child>
               <object class="GtkEntry" id="insearch">
                 <property name="can_focus">True</property>
-                <property name="invisible_char">&#x2022;</property>
+                <property name="invisible_char">•</property>
               </object>
               <packing>
                 <property name="expand">False</property>
+                <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="hbox1">
-                <property name="height_request">500</property>
+              <object class="GtkScrolledWindow" id="scrollplaylist">
                 <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="hscrollbar_policy">never</property>
                 <child>
-                  <object class="GtkScrolledWindow" id="scrolledcovers">
-                    <property name="width_request">550</property>
+                  <object class="GtkTreeView" id="list_active">
                     <property name="height_request">500</property>
-                    <property name="can_focus">True</property>
-                    <property name="hscrollbar_policy">never</property>
-                    <property name="vscrollbar_policy">automatic</property>
-                    <child>
-                      <placeholder/>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkScrolledWindow" id="scrollplaylist">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="hscrollbar_policy">never</property>
-                    <property name="vscrollbar_policy">automatic</property>
-                    <child>
-                      <object class="GtkTreeView" id="list_active">
-                        <property name="height_request">500</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="reorderable">True</property>
-                        <property name="enable_search">False</property>
-                        <property name="hover_selection">True</property>
-                      </object>
+                    <property name="enable_search">False</property>
+                    <property name="hover_selection">True</property>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection" id="treeview-selection"/>
                     </child>
                   </object>
-                  <packing>
-                    <property name="position">1</property>
-                  </packing>
                 </child>
               </object>
               <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </object>
           <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
             <property name="position">2</property>
           </packing>
         </child>
@@ -191,13 +238,38 @@
           <object class="GtkHBox" id="hbox_buttons">
             <property name="height_request">24</property>
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <child>
-              <object class="GtkButton" id="bt_prev">
+              <object class="GtkButton" id="bt_options">
+                <property name="use_action_appearance">False</property>
                 <property name="width_request">24</property>
                 <property name="height_request">24</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <property name="image">img_options</property>
+                <property name="relief">none</property>
+                <property name="focus_on_click">False</property>
+                <property name="xalign">0</property>
+                <property name="yalign">0</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="pack_type">end</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="bt_prev">
+                <property name="use_action_appearance">False</property>
+                <property name="width_request">24</property>
+                <property name="height_request">24</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="image">img_prev</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
@@ -212,11 +284,13 @@
             </child>
             <child>
               <object class="GtkButton" id="bt_pause">
+                <property name="use_action_appearance">False</property>
                 <property name="width_request">24</property>
                 <property name="height_request">24</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="image">img_pause</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
@@ -231,11 +305,13 @@
             </child>
             <child>
               <object class="GtkButton" id="bt_stop">
+                <property name="use_action_appearance">False</property>
                 <property name="width_request">24</property>
                 <property name="height_request">24</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="image">img_stop</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
@@ -250,11 +326,13 @@
             </child>
             <child>
               <object class="GtkButton" id="bt_play">
+                <property name="use_action_appearance">False</property>
                 <property name="width_request">24</property>
                 <property name="height_request">24</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="image">img_play</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
@@ -269,11 +347,13 @@
             </child>
             <child>
               <object class="GtkButton" id="bt_next">
+                <property name="use_action_appearance">False</property>
                 <property name="width_request">24</property>
                 <property name="height_request">24</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="image">img_next</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
@@ -288,11 +368,13 @@
             </child>
             <child>
               <object class="GtkButton" id="bt_repeat">
+                <property name="use_action_appearance">False</property>
                 <property name="width_request">24</property>
                 <property name="height_request">24</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="image">img_repeat</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
@@ -308,18 +390,22 @@
             <child>
               <object class="GtkFixed" id="fixed3">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
               </object>
               <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
                 <property name="position">7</property>
               </packing>
             </child>
             <child>
               <object class="GtkButton" id="bt_albums">
+                <property name="use_action_appearance">False</property>
                 <property name="width_request">24</property>
                 <property name="height_request">24</property>
-                <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="image">img_albums</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
@@ -333,26 +419,6 @@
                 <property name="position">8</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkButton" id="bt_options">
-                <property name="width_request">24</property>
-                <property name="height_request">24</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="image">img_options</property>
-                <property name="relief">none</property>
-                <property name="focus_on_click">False</property>
-                <property name="xalign">0</property>
-                <property name="yalign">0</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="pack_type">end</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -362,55 +428,5 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkImage" id="img_prev">
-    <property name="visible">True</property>
-    <property name="pixbuf">icons/media-skip-backward.png</property>
-    <property name="icon-size">2</property>
-  </object>
-  <object class="GtkImage" id="img_pause">
-    <property name="visible">True</property>
-    <property name="pixbuf">icons/media-playback-pause.png</property>
-    <property name="icon-size">2</property>
-  </object>
-  <object class="GtkImage" id="img_stop">
-    <property name="visible">True</property>
-    <property name="xalign">0</property>
-    <property name="yalign">0</property>
-    <property name="pixbuf">icons/media-playback-stop.png</property>
-    <property name="icon-size">2</property>
-  </object>
-  <object class="GtkImage" id="img_play">
-    <property name="visible">True</property>
-    <property name="pixbuf">icons/media-playback-start.png</property>
-    <property name="icon-size">2</property>
-  </object>
-  <object class="GtkImage" id="img_next">
-    <property name="visible">True</property>
-    <property name="xalign">0</property>
-    <property name="yalign">0</property>
-    <property name="pixbuf">icons/media-skip-forward.png</property>
-    <property name="icon-size">2</property>
-  </object>
-  <object class="GtkImage" id="img_albums">
-    <property name="visible">True</property>
-    <property name="xalign">0</property>
-    <property name="yalign">0</property>
-    <property name="pixbuf">icons/music-library.png</property>
-    <property name="icon-size">2</property>
-  </object>
-  <object class="GtkImage" id="img_options">
-    <property name="visible">True</property>
-    <property name="xalign">0</property>
-    <property name="yalign">0</property>
-    <property name="pixbuf">icons/options.png</property>
-    <property name="icon-size">2</property>
-  </object>
-  <object class="GtkImage" id="img_repeat">
-    <property name="visible">True</property>
-    <property name="xalign">0</property>
-    <property name="yalign">0</property>
-    <property name="pixbuf">icons/media-playlist-repeat.png</property>
-    <property name="icon-size">2</property>
   </object>
 </interface>

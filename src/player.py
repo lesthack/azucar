@@ -55,7 +55,7 @@ class player:
         self.timer = self.builder.get_object("lb_timer")
         
         #self.list_covers = self.builder.get_object("list_covers")        
-        self.scrolledcovers = self.builder.get_object("scrolledcovers")
+        #self.scrolledcovers = self.builder.get_object("scrolledcovers")
                 
         attr_timer = pango.AttrList()
         attr_timer.insert(pango.AttrSize(24000, 0, -1)) #font size
@@ -108,18 +108,38 @@ class player:
         self.volume = 100
         self.pos_move = -1        
         
-        self.model_songs = gtk.ListStore (int, str, str, 'gboolean')
+        self.model_songs = gtk.ListStore (int, str, str, str, 'gboolean')
         self.list_active.set_model(self.model_songs)
-        self.list_active.enable_model_drag_source( gtk.gdk.BUTTON1_MASK, self.TARGETS, gtk.gdk.ACTION_DEFAULT|gtk.gdk.ACTION_MOVE)
-        self.list_active.enable_model_drag_dest(self.TARGETS, gtk.gdk.ACTION_DEFAULT)
+        
+        #self.list_active.enable_model_drag_source( gtk.gdk.BUTTON1_MASK, self.TARGETS, gtk.gdk.ACTION_DEFAULT|gtk.gdk.ACTION_MOVE)
+        #self.list_active.enable_model_drag_dest(self.TARGETS, gtk.gdk.ACTION_DEFAULT)
         
         render = gtk.CellRendererText() 
-        render.set_property('cell-background', '#eee')        
-        columna_one = gtk.TreeViewColumn ("Artist", render, text=1, cell_background_set=3)
-        columna_one.set_resizable(True)
-        columna_two = gtk.TreeViewColumn ("Song", render, text=2, cell_background_set=3)        
+        render.set_property('cell-background', '#eee')
+        render.set_alignment(0.5, 0.5)
+          
+        columna_one = gtk.TreeViewColumn("Time", render, text=1, cell_background_set=4)
+        columna_one.set_alignment(0.5)
+        columna_one.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)        
+        columna_one.set_fixed_width(50)
+        
+        render_two = gtk.CellRendererText() 
+        render_two.set_property('cell-background', '#eee')
+        render_two.set_alignment(0, 0.5)
+        
+        columna_two = gtk.TreeViewColumn("Song", render_two, text=2, cell_background_set=4)
+        columna_two.set_alignment(0.5)
+        columna_two.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        columna_two.set_fixed_width(250)
+        
+        columna_three = gtk.TreeViewColumn("Album", render_two, text=3, cell_background_set=4)
+        columna_three.set_alignment(0.5)
+        columna_three.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        #columna_three.set_fixed_width(100)
+        
         self.list_active.append_column(columna_one)
         self.list_active.append_column(columna_two)
+        self.list_active.append_column(columna_three)
         self.cellbackground = True
         
         pynotify.init('Azucar')        
@@ -132,10 +152,10 @@ class player:
         
         # covers
         #self.table_covers = gtk.Table(5, 1, True)
-        self.table_covers = cover.cover(5, 1, True)
+        #self.table_covers = cover.cover(5, 1, True)
         
-        self.table_covers.show()
-        self.scrolledcovers.add_with_viewport(self.table_covers)
+        #self.table_covers.show()
+        #self.scrolledcovers.add_with_viewport(self.table_covers)
                 
         #self.list_covers = gtk.VBox(None, 0)
         #self.scrolledcovers.add_with_viewport(self.list_covers)
@@ -297,8 +317,9 @@ class player:
             # taginfo[2] song
             # taginfo[3] album
             # taginfo[4] cover
-            
-            self.model_songs.append([taginfo[0], taginfo[1], taginfo[2], self.cellbackground])        
+            # taginfo[5] time
+                        
+            self.model_songs.append([taginfo[0], taginfo[5], taginfo[2], taginfo[3], self.cellbackground])        
             self.cellbackground = (True, False)[self.cellbackground==True]
         except:
             self.logger.error("Can't to append: %s" % result.value())    
@@ -312,16 +333,16 @@ class player:
             
             try:
                 iter = self.model_songs.get_iter(self.pos_move)
-                self.model_songs.insert_before(iter, [taginfo[0], taginfo[1], taginfo[2], self.cellbackground])
+                self.model_songs.insert_before(iter, [taginfo[0], taginfo[5], taginfo[2], taginfo[3], self.cellbackground])
             except:
                 iter = self.model_songs.get_iter(self.pos_move-1)
-                self.model_songs.insert_after(iter, [taginfo[0], taginfo[1], taginfo[2], self.cellbackground])
+                self.model_songs.insert_after(iter, [taginfo[0], taginfo[5], taginfo[2], taginfo[3], self.cellbackground])
             
             cellbackground = True
-            modeltemp = gtk.ListStore (int, str, str, 'gboolean')
+            modeltemp = gtk.ListStore (int, str, str, str, 'gboolean')
             
             for i in self.model_songs:                                        
-                modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), self.model_songs.get_value(i.iter, 2), cellbackground])
+                modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), self.model_songs.get_value(i.iter, 2), self.model_songs.get_value(i.iter, 3), cellbackground])
                 cellbackground = (True, False)[cellbackground==True]
     
             self.model_songs = modeltemp            
@@ -346,6 +367,9 @@ class player:
             else: track.append("")
             
             if info.has_key("picture_front"): track.append(info["picture_front"])
+            else: track.append("")
+            
+            if info.has_key("duration"): track.append(self.get_human_time(info["duration"]))
             else: track.append("")
             
         except:            
@@ -451,17 +475,24 @@ class player:
         self.volume = (self.volume+10, 100)[self.volume+10>100]
         self.xmms.playback_volume_set('master', self.volume)
 
-        notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
-        notify.set_timeout(500)
-        notify.show()
+        #notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
+        #notify.set_timeout(500)
+        #notify.show()
+        self.notify.update("Volume", "%d%s" % (self.volume,'%') )            
+        self.notify.set_icon_from_pixbuf(self.image_cover.get_pixbuf())            
+        self.notify.show()
         
     def volume_down(self):
         self.volume = (self.volume-10, 0)[self.volume-10<=0]
         self.xmms.playback_volume_set('master', self.volume)            
 
-        notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
-        notify.set_timeout(500)
-        notify.show()    
+        #notify = pynotify.Notification("Volume", "%d%s" % (self.volume,'%') )
+        #notify.set_timeout(500)
+        #notify.show()
+        
+        self.notify.update("Volume", "%d%s" % (self.volume,'%') )            
+        self.notify.set_icon_from_pixbuf(self.image_cover.get_pixbuf())            
+        self.notify.show()
     
     def xmms2_volume(self, result):
         try:
@@ -603,12 +634,12 @@ class player:
         else:
             self.list_active.set_reorderable(False)
             
-        modeltemp = gtk.ListStore (int, str, str, 'gboolean')
+        modeltemp = gtk.ListStore (int, str, str, str, 'gboolean')
         cellbackground = True        
         for i in self.model_songs:                        
-            match = re.search(r'%s' % widget.get_text().lower(), "%s %s" % (self.model_songs.get_value(i.iter, 1).lower(),self.model_songs.get_value(i.iter, 2).lower()))
+            match = re.search(r'%s' % widget.get_text().lower(), "%s %s" % (self.model_songs.get_value(i.iter, 2).lower(),self.model_songs.get_value(i.iter, 3).lower()))
             if match:
-                modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), self.model_songs.get_value(i.iter, 2), cellbackground])
+                modeltemp.append([self.model_songs.get_value(i.iter, 0), self.model_songs.get_value(i.iter, 1), self.model_songs.get_value(i.iter, 2), self.model_songs.get_value(i.iter, 3),cellbackground])
                 cellbackground = (True, False)[cellbackground==True]
 
         self.list_active.set_model(modeltemp)
@@ -628,6 +659,12 @@ class player:
         
     def exit(self):
         gtk.main_quit()
+	
+    def get_human_time(self, time_playback):        
+        min = time_playback/(60*1000)
+        sec = (time_playback - min*1000*60)/1000
+        
+        return "%02d:%02d" % (min, sec)
 	
     def toggle_list(self, widget=None):
         if self.list_active.get_visible(): 

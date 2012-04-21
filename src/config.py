@@ -19,6 +19,7 @@ class config:
         self.path_xmms2_config = "%s/.config/xmms2" % os.getenv("HOME")
         
         # audioscrobbler
+        self.path_clients = "%s/clients" % self.path_xmms2_config
         self.path_scrobbler_bin = "/usr/bin/xmms2-scrobbler"
         self.path_scrobbler_config = "%s/clients/xmms2-scrobbler" % self.path_xmms2_config 
         
@@ -69,11 +70,13 @@ class config:
             text_temp = " Xmms2-scrobbler installed: YES\n"
             self.ch_sc_status.set_active(True)
             
+            text_configure_clients = os.path.isdir(self.path_clients)
             text_configure_directory = os.path.isdir(self.path_scrobbler_config)
             text_configure_lastfm = os.path.isdir(self.path_scrobbler_lastfm)
             text_configure_lastfm_config = os.path.isfile("%s/config" % self.path_scrobbler_lastfm)
             text_configure_symbolic_link = os.path.isfile("%s/startup.d/xmms2-scrobbler" % self.path_xmms2_config)
             
+            text_temp += " Exist Xmms2 Clients Directory: %s\n" % ("NO","YES")[text_configure_clients]
             text_temp += " Exist Xmms2 Configure Directory: %s\n" % ("NO","YES")[text_configure_directory]
             text_temp += " Exist Scrobbler Config Directory: %s\n" % ("NO","YES")[text_configure_lastfm]
             text_temp += " Exist LastFm Config File: %s\n" % ("NO","YES")[text_configure_lastfm_config]
@@ -119,6 +122,10 @@ class config:
         textbuffer = self.tx_sc_status.get_buffer()                
         textbuffer.set_text(text_temp)
         
+        if not os.path.isdir(self.path_clients):
+            os.mkdir(self.path_clients)
+            text_temp += "Doing xmms2 clients directory...\n"
+            
         if not os.path.isdir(self.path_scrobbler_config):
             os.mkdir(self.path_scrobbler_config)
             text_temp += "Doing scrobbler directory...\n"
